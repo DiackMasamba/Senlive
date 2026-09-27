@@ -40,6 +40,12 @@
     "scheme": "senlive",
     "splash": {
       "backgroundColor": "#FFFFFF"
+    },
+    "owner": "senlive",
+    "extra": {
+      "eas": {
+        "projectId": "8fa4511a-405f-49e4-ba82-02ed7fab0877"
+      }
     }
   }
 }
