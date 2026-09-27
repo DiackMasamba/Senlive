@@ -6,19 +6,16 @@ Application mobile de lives payants par abonnement mensuel (Sénégal). Construi
 
 ```bash
 npm install
+cp .env.example .env.local
 npx expo start
 ```
 
 Scanne le QR code avec l'app **Expo Go** sur ton téléphone, ou appuie sur `w` pour l'ouvrir dans le navigateur.
 
-## État actuel (maquette fonctionnelle)
+## État du projet
 
-- Écran de démarrage, accueil, menu latéral, connexion par numéro +221 et code SMS
-- Explorer (recherche et catégories), préparation d'un live, écran de live avec chat
-- Offre Senlive Premium avec choix Wave, Orange Money ou carte
-
-Les données, la connexion et le paiement sont **simulés** (`src/data/mock.ts`, `src/context/session.tsx`).
-La suite suit le cahier des charges : API et comptes (lot 1), vidéo WebRTC (lot 2), paiement réel (lot 3), modération et back-office (lot 4).
+Voir **[docs/CONTEXTE.md](docs/CONTEXTE.md)** : décisions, état, carte du code et prochaines étapes.
+La connexion se fait par code e-mail (Supabase), les paiements via PayTech, l'APK Android est compilé par EAS (branche `apk`).
 
 ## Structure
 
