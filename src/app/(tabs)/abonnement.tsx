@@ -108,7 +108,7 @@ export default function SubscriptionScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surface },
-  content: { paddingBottom: 110, gap: 8 },
+  content: { paddingBottom: 24, gap: 8 },
   block: { backgroundColor: colors.white },
   offer: {
     margin: 14,

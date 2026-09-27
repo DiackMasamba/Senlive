@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   chipActive: { backgroundColor: colors.navy, borderColor: colors.navy },
   chipText: { color: colors.navy, fontSize: 13, lineHeight: 16 },
   chipTextActive: { color: colors.white, fontWeight: '600' },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 9, paddingBottom: 110, backgroundColor: colors.surface, paddingTop: 5 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 9, paddingBottom: 24, backgroundColor: colors.surface, paddingTop: 5 },
   cell: { width: '50%', padding: 5 },
   empty: { color: colors.textMuted, padding: 20, fontSize: 15 },
 });

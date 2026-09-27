@@ -133,7 +133,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surface },
-  content: { paddingBottom: 110, gap: 8 },
+  content: { paddingBottom: 24, gap: 8 },
   top: { backgroundColor: colors.white, paddingHorizontal: 14, paddingTop: 12, paddingBottom: 14 },
   search: {
     flexDirection: 'row',

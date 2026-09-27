@@ -6,6 +6,7 @@ export const colors = {
   navySoft: '#6E6E6E',
   live: '#FF3B5C',
   white: '#FFFFFF',
+  inactive: 'rgba(255,255,255,0.55)',
   background: '#FFFFFF',
   surface: '#F5F5F5',
   border: '#DADADA',
