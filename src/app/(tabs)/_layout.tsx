@@ -12,7 +12,7 @@ const tabs: Record<string, { label: string; icon: IconName; iconActive: IconName
   explorer: { label: 'Explorer', icon: 'compass-outline', iconActive: 'compass' },
   golive: { label: 'Go Live', icon: 'radio-outline', iconActive: 'radio' },
   abonnement: { label: 'Premium', icon: 'star-outline', iconActive: 'star' },
-  compte: { label: 'Mon compte', icon: 'person-outline', iconActive: 'person' },
+  compte: { label: 'Compte', icon: 'person-outline', iconActive: 'person' },
 };
 
 function TabBar({ state, navigation }: BottomTabBarProps) {
