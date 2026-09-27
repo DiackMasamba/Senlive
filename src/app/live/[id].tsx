@@ -9,6 +9,7 @@ import type { Gift } from '../../data/gifts';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSession } from '../../context/session';
 import { useWallet } from '../../context/wallet';
+import { useAndroidKeyboardHeight } from '../../hooks/useKeyboardHeight';
 import { chatSeed, formatViewers } from '../../data/mock';
 import { useLives } from '../../data/useLives';
 import { colors, radius } from '../../theme';
@@ -18,6 +19,7 @@ export default function LiveScreen() {
   const { lives } = useLives();
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
+  const keyboardHeight = useAndroidKeyboardHeight();
   const { user, subscription, openLogin } = useSession();
   const wallet = useWallet();
   const live = lives.find((l) => l.id === id) ?? lives[0];
@@ -58,7 +60,7 @@ export default function LiveScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={[styles.screen, { backgroundColor: live.color }]}
+      style={[styles.screen, { backgroundColor: live.color, paddingBottom: keyboardHeight }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       {live.thumbnail && <Image source={{ uri: live.thumbnail }} style={StyleSheet.absoluteFill} resizeMode="cover" />}

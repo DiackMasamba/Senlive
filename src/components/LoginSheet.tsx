@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, type Text
 import { Text, TextInput } from './AppText';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSession } from '../context/session';
+import { useAndroidKeyboardHeight } from '../hooks/useKeyboardHeight';
 import { realAuth, saveProfile, sendOtp, verifyOtp } from '../lib/auth';
 import { colors, radius } from '../theme';
 
@@ -23,6 +24,7 @@ export function LoginSheet() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const codeInput = useRef<RNTextInput>(null);
+  const keyboardHeight = useAndroidKeyboardHeight();
 
   const cleanEmail = email.trim().toLowerCase();
   const cleanUsername = username.toLowerCase().replace(/[^a-z0-9._]/g, '');
@@ -99,7 +101,11 @@ export function LoginSheet() {
   return (
     <Modal visible={loginVisible} transparent animationType="slide" onRequestClose={close}>
       <Pressable style={styles.backdrop} onPress={close} accessibilityLabel="Fermer" />
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.sheetWrap} pointerEvents="box-none">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={[styles.sheetWrap, { paddingBottom: keyboardHeight }]}
+        pointerEvents="box-none"
+      >
         <View style={styles.sheet}>
           <View style={styles.grabber} />
           {step === 'email' && (
