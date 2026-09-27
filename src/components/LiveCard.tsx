@@ -31,10 +31,10 @@ export function LiveCard({ live, width }: Props) {
           <Text style={styles.viewersText}>{formatViewers(live.viewers)}</Text>
         </View>
       </View>
-      <Text style={styles.title} numberOfLines={2}>
+      <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
         {live.title}
       </Text>
-      <Text style={styles.host}>{live.handle}</Text>
+      <Text style={styles.host} numberOfLines={1}>{live.handle}</Text>
     </Pressable>
   );
 }
@@ -42,7 +42,7 @@ export function LiveCard({ live, width }: Props) {
 const styles = StyleSheet.create({
   card: { gap: 6 },
   thumb: {
-    height: 210,
+    height: 190,
     borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
@@ -83,6 +83,6 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   viewersText: { color: colors.white, fontSize: 12, fontWeight: '600' },
-  title: { color: colors.navy, fontSize: 14, fontWeight: '600' },
+  title: { color: colors.navy, fontSize: 12.5, fontWeight: '600', lineHeight: 18 },
   host: { color: colors.textMuted, fontSize: 12 },
 });
