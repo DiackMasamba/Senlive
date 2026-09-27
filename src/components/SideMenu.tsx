@@ -1,6 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from './AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSession } from '../context/session';
 import { colors, radius } from '../theme';
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 24,
     overflow: 'hidden',
   },
-  scrim: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)' },
+  scrim: { flex: 1, backgroundColor: 'rgba(11,45,111,0.82)' },
   top: {
     backgroundColor: colors.yellow,
     paddingHorizontal: 20,

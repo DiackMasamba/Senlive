@@ -1,6 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from '../../components/AppText';
 import { Header } from '../../components/Header';
 import { type PaymentMethod, useSession } from '../../context/session';
 import { SUBSCRIPTION_PRICE } from '../../data/mock';

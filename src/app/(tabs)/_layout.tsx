@@ -1,6 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs, type BottomTabBarProps } from 'expo-router/js-tabs';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '../../components/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../../theme';
 
@@ -46,7 +47,7 @@ function TabBar({ state, navigation }: BottomTabBarProps) {
               size={28}
               color={focused ? colors.yellow : colors.white}
             />
-            <Text style={[styles.label, focused && { color: colors.yellow }]}>{meta.label}</Text>
+            <Text numberOfLines={1} style={[styles.label, focused && { color: colors.yellow }]}>{meta.label}</Text>
           </Pressable>
         );
       })}
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
   item: { flex: 1, alignItems: 'center', gap: 6 },
-  label: { color: colors.white, fontSize: 13 },
+  label: { color: colors.white, fontSize: 11.5 },
   centerButton: {
     width: 76,
     height: 76,
