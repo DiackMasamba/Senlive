@@ -8,6 +8,7 @@ import { LoginSheet } from '../components/LoginSheet';
 import { SideMenu } from '../components/SideMenu';
 import { Splash } from '../components/Splash';
 import { SessionProvider } from '../context/session';
+import { WalletProvider } from '../context/wallet';
 
 const SPLASH_MS = 1600;
 
@@ -26,14 +27,17 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <SessionProvider>
+        <WalletProvider>
         <StatusBar style="dark" />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="live/[id]" options={{ animation: 'slide_from_bottom' }} />
+          <Stack.Screen name="portefeuille" />
         </Stack>
         <SideMenu />
         <LoginSheet />
         {showSplash && <Splash />}
+        </WalletProvider>
       </SessionProvider>
     </SafeAreaProvider>
   );

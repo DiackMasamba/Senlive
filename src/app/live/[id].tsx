@@ -8,6 +8,7 @@ import { GiftSheet } from '../../components/GiftSheet';
 import type { Gift } from '../../data/gifts';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSession } from '../../context/session';
+import { useWallet } from '../../context/wallet';
 import { chatSeed, formatViewers } from '../../data/mock';
 import { useLives } from '../../data/useLives';
 import { colors, radius } from '../../theme';
@@ -18,6 +19,7 @@ export default function LiveScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { user, subscription, openLogin } = useSession();
+  const wallet = useWallet();
   const live = lives.find((l) => l.id === id) ?? lives[0];
   const [messages, setMessages] = useState<{ id: string; user: string; text: string; gift?: boolean }[]>(chatSeed);
   const [draft, setDraft] = useState('');
@@ -37,9 +39,10 @@ export default function LiveScreen() {
   const openGifts = () => (user ? setGiftsOpen(true) : openLogin());
 
   const sendGift = (gift: Gift) => {
+    if (!wallet.sendGift(gift, live.host)) return;
     setGiftsOpen(false);
     setMessages((m) => [...m, { id: String(Date.now()), user: 'Moi', text: `a envoyé ${gift.emoji} ${gift.label}`, gift: true }]);
-    setReceived((n) => n + gift.price);
+    setReceived((n) => n + gift.coins);
     setBurst(gift);
   };
 

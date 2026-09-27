@@ -8,11 +8,12 @@ import { useSession } from '../context/session';
 import { categories } from '../data/mock';
 import { colors } from '../theme';
 
-type Href = '/compte' | '/abonnement' | '/golive' | '/explorer';
+type Href = '/compte' | '/abonnement' | '/golive' | '/explorer' | '/portefeuille';
 type Item = { icon: keyof typeof Ionicons.glyphMap; label: string; href?: Href };
 
 const accountItems: Item[] = [
   { icon: 'person-outline', label: 'Mon profil', href: '/compte' },
+  { icon: 'wallet-outline', label: 'Mon portefeuille', href: '/portefeuille' },
   { icon: 'star-outline', label: 'Mon abonnement', href: '/abonnement' },
   { icon: 'videocam-outline', label: 'Devenir créateur', href: '/golive' },
   { icon: 'settings-outline', label: 'Mes paramètres', href: '/compte' },

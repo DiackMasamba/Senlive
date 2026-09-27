@@ -6,10 +6,12 @@ import { Avatar } from '../../components/Avatar';
 import { Header } from '../../components/Header';
 import { pickImage } from '../../lib/pickImage';
 import { useSession } from '../../context/session';
+import { useWallet } from '../../context/wallet';
 import { colors, radius } from '../../theme';
 
 export default function AccountScreen() {
   const { user, subscription, avatar, setAvatar, openLogin, signOut } = useSession();
+  const { coins } = useWallet();
 
   const changePhoto = async () => {
     if (!user) return openLogin();
@@ -24,6 +26,7 @@ export default function AccountScreen() {
       rows: [
         { icon: 'camera-outline', label: avatar ? 'Changer ma photo' : 'Ajouter une photo de profil', onPress: changePhoto },
         { icon: 'create-outline', label: 'Modifier mon profil' },
+        { icon: 'wallet-outline', label: `Portefeuille · ${coins.toLocaleString('fr-FR')} pièces`, onPress: () => router.push('/portefeuille') },
         { icon: 'star-outline', label: subscription ? 'Mon abonnement Premium' : 'Passer Premium', onPress: () => router.navigate('/abonnement') },
         { icon: 'videocam-outline', label: 'Devenir créateur', onPress: () => router.navigate('/golive') },
       ],

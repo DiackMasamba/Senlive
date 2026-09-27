@@ -1,12 +1,11 @@
-// Cadeaux virtuels envoyés pendant un live. Les prix sont en FCFA ;
-// le paiement réel (Wave, Orange Money) passera par l'agrégateur au lot 3.
-export type Gift = { id: string; label: string; emoji: string; price: number };
+// Cadeaux virtuels envoyés pendant un live, payés en pièces (1 pièce = 10 FCFA).
+export type Gift = { id: string; label: string; emoji: string; coins: number };
 
 export const gifts: Gift[] = [
-  { id: 'rose', label: 'Rose', emoji: '🌹', price: 100 },
-  { id: 'attaya', label: 'Attaya', emoji: '🍵', price: 250 },
-  { id: 'thieb', label: 'Thiéb', emoji: '🍲', price: 500 },
-  { id: 'djembe', label: 'Djembé', emoji: '🥁', price: 1000 },
-  { id: 'lion', label: 'Lion', emoji: '🦁', price: 2500 },
-  { id: 'couronne', label: 'Couronne', emoji: '👑', price: 5000 },
+  { id: 'rose', label: 'Rose', emoji: '🌹', coins: 10 },
+  { id: 'attaya', label: 'Attaya', emoji: '🍵', coins: 25 },
+  { id: 'thieb', label: 'Thiéb', emoji: '🍲', coins: 50 },
+  { id: 'djembe', label: 'Djembé', emoji: '🥁', coins: 100 },
+  { id: 'lion', label: 'Lion', emoji: '🦁', coins: 250 },
+  { id: 'couronne', label: 'Couronne', emoji: '👑', coins: 500 },
 ];

@@ -3,7 +3,9 @@ import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from './AppText';
 import { gifts, type Gift } from '../data/gifts';
-import { colors, formatFcfa } from '../theme';
+import { router } from 'expo-router';
+import { useWallet } from '../context/wallet';
+import { colors } from '../theme';
 
 type Props = { visible: boolean; host: string; onClose: () => void; onSend: (gift: Gift) => void };
 
@@ -11,6 +13,12 @@ type Props = { visible: boolean; host: string; onClose: () => void; onSend: (gif
 export function GiftSheet({ visible, host, onClose, onSend }: Props) {
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState<Gift>(gifts[0]);
+  const { coins } = useWallet();
+  const enough = coins >= selected.coins;
+  const recharge = () => {
+    onClose();
+    router.push('/portefeuille');
+  };
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -19,6 +27,12 @@ export function GiftSheet({ visible, host, onClose, onSend }: Props) {
         <View style={styles.grabber} />
         <Text style={styles.title}>Envoyer un cadeau</Text>
         <Text style={styles.subtitle}>Soutiens {host} pendant son live</Text>
+        <View style={styles.balanceRow}>
+          <Text style={styles.balance}>🪙 {coins.toLocaleString('fr-FR')} pièces</Text>
+          <Pressable onPress={recharge} hitSlop={8}>
+            <Text style={styles.rechargeLink}>Recharger</Text>
+          </Pressable>
+        </View>
         <View style={styles.grid}>
           {gifts.map((g) => {
             const active = g.id === selected.id;
@@ -27,18 +41,18 @@ export function GiftSheet({ visible, host, onClose, onSend }: Props) {
                 <View style={[styles.gift, active && styles.giftActive]}>
                   <Text style={styles.emoji}>{g.emoji}</Text>
                   <Text style={styles.label}>{g.label}</Text>
-                  <Text style={styles.price}>{formatFcfa(g.price)}</Text>
+                  <Text style={styles.price}>🪙 {g.coins}</Text>
                 </View>
               </Pressable>
             );
           })}
         </View>
-        <Pressable style={styles.button} onPress={() => onSend(selected)}>
+        <Pressable style={styles.button} onPress={() => (enough ? onSend(selected) : recharge())}>
           <Text style={styles.buttonText}>
-            Envoyer {selected.emoji} · {formatFcfa(selected.price)}
+            {enough ? `Envoyer ${selected.emoji} · ${selected.coins} pièces` : 'Solde insuffisant · Recharger'}
           </Text>
         </Pressable>
-        <Text style={styles.note}>Démo : aucun paiement n'est prélevé. Wave et Orange Money seront branchés plus tard.</Text>
+        <Text style={styles.note}>1 pièce = 10 FCFA. Le créateur reçoit 50 % en diamants.</Text>
       </View>
     </Modal>
   );
@@ -60,6 +74,18 @@ const styles = StyleSheet.create({
   grabber: { alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: '#D6D6D6', marginBottom: 12 },
   title: { color: colors.navy, fontSize: 16, fontWeight: '700', textAlign: 'center' },
   subtitle: { color: colors.textMuted, fontSize: 12.5, textAlign: 'center', marginTop: 2, marginBottom: 12 },
+  balanceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.surface,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    height: 38,
+    marginBottom: 10,
+  },
+  balance: { color: colors.navy, fontSize: 13, fontWeight: '600' },
+  rechargeLink: { color: colors.navy, fontSize: 13, fontWeight: '700', textDecorationLine: 'underline' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -4 },
   cell: { width: '33.333%', padding: 4 },
   gift: {
