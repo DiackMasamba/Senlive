@@ -1,0 +1,14 @@
+# Compile l'APK Android de test (profil preview) à chaque push sur la branche « apk ».
+name: APK Android de test
+
+on:
+  push:
+    branches: ['apk']
+
+jobs:
+  build_android:
+    name: APK Android (preview)
+    type: build
+    params:
+      platform: android
+      profile: preview
