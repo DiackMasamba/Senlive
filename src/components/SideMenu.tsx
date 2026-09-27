@@ -2,76 +2,88 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from './AppText';
+import { Wordmark } from './Header';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSession } from '../context/session';
-import { colors, radius } from '../theme';
+import { categories } from '../data/mock';
+import { colors } from '../theme';
 
-type Item = { icon: keyof typeof Ionicons.glyphMap; label: string; href?: '/compte' | '/abonnement' | '/golive' };
+type Href = '/compte' | '/abonnement' | '/golive' | '/explorer';
+type Item = { icon: keyof typeof Ionicons.glyphMap; label: string; href?: Href };
 
-const items: Item[] = [
+const accountItems: Item[] = [
   { icon: 'person-outline', label: 'Mon profil', href: '/compte' },
   { icon: 'star-outline', label: 'Mon abonnement', href: '/abonnement' },
   { icon: 'videocam-outline', label: 'Devenir créateur', href: '/golive' },
   { icon: 'settings-outline', label: 'Mes paramètres', href: '/compte' },
-  { icon: 'headset-outline', label: 'Aide & Support' },
+];
+
+const moreItems: Item[] = [
   { icon: 'thumbs-up-outline', label: "Noter l'application" },
   { icon: 'share-social-outline', label: "Partager l'application" },
 ];
 
+// Menu latéral compact, inspiré de Jumia : sections en capitales et lignes serrées.
 export function SideMenu() {
   const insets = useSafeAreaInsets();
   const { menuVisible, closeMenu, user, openLogin, signOut } = useSession();
 
-  const go = (href?: Item['href']) => {
+  const go = (href?: Href) => {
     closeMenu();
     if (href) router.navigate(href);
   };
 
+  const Row = ({ item }: { item: Item }) => (
+    <Pressable style={styles.row} onPress={() => go(item.href)}>
+      <Ionicons name={item.icon} size={21} color={colors.navy} />
+      <Text style={styles.rowLabel}>{item.label}</Text>
+    </Pressable>
+  );
+
   return (
     <Modal visible={menuVisible} transparent animationType="fade" onRequestClose={closeMenu}>
       <View style={styles.root}>
-        <View style={styles.panel}>
-          <View style={[styles.top, { paddingTop: insets.top + 20 }]}>
-            <View style={styles.langPill}>
-              <Text style={styles.langText}>Sénégal</Text>
-              <Ionicons name="chevron-down" size={16} color={colors.navy} />
-              <Text style={styles.langSep}>|</Text>
-              <Text style={styles.langText}>FR</Text>
-            </View>
-            <View style={styles.profileRow}>
-              <View style={styles.avatar}>
-                <Ionicons name="person" size={34} color={colors.navySoft} />
-                <View style={styles.editBadge}>
-                  <Ionicons name="pencil" size={14} color={colors.yellow} />
-                </View>
-              </View>
-              <View style={{ gap: 8 }}>
-                <Text style={styles.guest}>{user ? user.phone : 'Invité'}</Text>
-                {user ? (
-                  <Pressable style={styles.loginButton} onPress={signOut}>
-                    <Ionicons name="log-out-outline" size={18} color={colors.white} />
-                    <Text style={styles.loginText}>Déconnexion</Text>
-                  </Pressable>
-                ) : (
-                  <Pressable style={styles.loginButton} onPress={openLogin}>
-                    <Ionicons name="person-outline" size={18} color={colors.white} />
-                    <Text style={styles.loginText}>Connexion</Text>
-                  </Pressable>
-                )}
-              </View>
-            </View>
-            <Text style={styles.version}>Version 1.0</Text>
+        <View style={[styles.panel, { paddingTop: insets.top }]}>
+          <View style={styles.top}>
+            <Pressable onPress={closeMenu} hitSlop={10} accessibilityLabel="Fermer le menu">
+              <Ionicons name="close" size={26} color={colors.navy} />
+            </Pressable>
+            <Wordmark />
           </View>
-          <ScrollView contentContainerStyle={styles.list}>
-            {items.map((item) => (
-              <Pressable key={item.label} style={styles.row} onPress={() => go(item.href)}>
-                <View style={styles.rowIcon}>
-                  <Ionicons name={item.icon} size={24} color={colors.navy} />
-                </View>
-                <Text style={styles.rowLabel}>{item.label}</Text>
-                <Ionicons name="chevron-forward" size={22} color={colors.navy} />
-              </Pressable>
+
+          <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
+            <Pressable style={styles.sectionLink}>
+              <Text style={styles.sectionTitle}>BESOIN D'AIDE ?</Text>
+              <Ionicons name="chevron-forward" size={18} color={colors.navy} />
+            </Pressable>
+
+            <Pressable style={styles.sectionLink} onPress={() => (user ? go('/compte') : openLogin())}>
+              <Text style={styles.sectionTitle}>{user ? `COMPTE ${user.phone}` : 'VOTRE COMPTE SENLIVE'}</Text>
+              <Ionicons name="chevron-forward" size={18} color={colors.navy} />
+            </Pressable>
+            {accountItems.map((item) => (
+              <Row key={item.label} item={item} />
             ))}
+            <Pressable style={styles.row} onPress={user ? signOut : openLogin}>
+              <Ionicons name={user ? 'log-out-outline' : 'log-in-outline'} size={21} color={colors.navy} />
+              <Text style={styles.rowLabel}>{user ? 'Déconnexion' : 'Connexion'}</Text>
+            </Pressable>
+
+            <View style={[styles.sectionHead, styles.divider]}>
+              <Text style={styles.sectionTitle}>CATÉGORIES</Text>
+              <Pressable onPress={() => go('/explorer')} hitSlop={8}>
+                <Text style={styles.more}>Voir tout</Text>
+              </Pressable>
+            </View>
+            {categories.map((c) => (
+              <Row key={c.id} item={{ icon: c.icon as Item['icon'], label: c.label, href: '/explorer' }} />
+            ))}
+
+            <View style={styles.divider} />
+            {moreItems.map((item) => (
+              <Row key={item.label} item={item} />
+            ))}
+            <Text style={styles.footer}>Sénégal · Français · Version 1.0</Text>
           </ScrollView>
         </View>
         <Pressable style={styles.scrim} onPress={closeMenu} accessibilityLabel="Fermer le menu" />
@@ -82,74 +94,38 @@ export function SideMenu() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, flexDirection: 'row' },
-  panel: {
-    width: '85%',
-    maxWidth: 380,
-    backgroundColor: colors.white,
-    borderTopRightRadius: 24,
-    borderBottomRightRadius: 24,
-    overflow: 'hidden',
-  },
-  scrim: { flex: 1, backgroundColor: 'rgba(0,0,0,0.82)' },
+  panel: { width: '85%', maxWidth: 360, backgroundColor: colors.white },
+  scrim: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)' },
   top: {
-    backgroundColor: colors.yellow,
-    paddingHorizontal: 20,
-    paddingBottom: 14,
-    borderBottomRightRadius: 24,
-  },
-  langPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-end',
-    gap: 6,
-    backgroundColor: colors.yellowPale,
-    borderRadius: radius.pill,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    gap: 18,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
-  langText: { color: colors.navy, fontSize: 16, fontWeight: '500' },
-  langSep: { color: colors.navy, marginHorizontal: 4 },
-  profileRow: { flexDirection: 'row', alignItems: 'center', gap: 18, marginTop: 22 },
-  avatar: {
-    width: 78,
-    height: 78,
-    borderRadius: 39,
-    backgroundColor: '#E3E3E3',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  editBadge: {
-    position: 'absolute',
-    right: -4,
-    bottom: -4,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: colors.navy,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  guest: { color: colors.navy, fontSize: 17 },
-  loginButton: {
+  sectionLink: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    backgroundColor: colors.navy,
-    borderRadius: radius.pill,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    justifyContent: 'space-between',
+    paddingHorizontal: 18,
+    paddingVertical: 13,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
-  loginText: { color: colors.white, fontSize: 16, fontWeight: '500' },
-  version: { alignSelf: 'flex-end', color: colors.navy, fontSize: 13, marginTop: 18 },
-  list: { paddingVertical: 20, paddingHorizontal: 20, gap: 10 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 16, paddingVertical: 6 },
-  rowIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.surface,
+  sectionHead: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 18,
+    paddingTop: 14,
+    paddingBottom: 4,
   },
-  rowLabel: { flex: 1, color: colors.navy, fontSize: 17 },
+  divider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border, marginTop: 6 },
+  sectionTitle: { color: colors.textMuted, fontSize: 12.5, fontWeight: '600', letterSpacing: 0.3 },
+  more: { color: colors.navy, fontSize: 13, fontWeight: '600', textDecorationLine: 'underline' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 18, paddingVertical: 9 },
+  rowLabel: { flex: 1, color: colors.navy, fontSize: 14.5 },
+  footer: { color: colors.textMuted, fontSize: 12, paddingHorizontal: 18, marginTop: 14 },
 });
