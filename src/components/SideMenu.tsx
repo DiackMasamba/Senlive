@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 24,
     overflow: 'hidden',
   },
-  scrim: { flex: 1, backgroundColor: 'rgba(11,45,111,0.82)' },
+  scrim: { flex: 1, backgroundColor: 'rgba(0,0,0,0.82)' },
   top: {
     backgroundColor: colors.yellow,
     paddingHorizontal: 20,
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     width: 78,
     height: 78,
     borderRadius: 39,
-    backgroundColor: '#DDE6F3',
+    backgroundColor: '#E3E3E3',
     alignItems: 'center',
     justifyContent: 'center',
   },

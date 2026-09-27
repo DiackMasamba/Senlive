@@ -73,7 +73,7 @@ export function LoginSheet() {
                   value={phone}
                   onChangeText={(t) => setPhone(t.replace(/[^\d ]/g, ''))}
                   placeholder="77 123 45 67"
-                  placeholderTextColor="#9AAACB"
+                  placeholderTextColor="#9E9E9E"
                   keyboardType="phone-pad"
                   maxLength={12}
                   style={styles.input}
@@ -138,7 +138,7 @@ export function LoginSheet() {
             <Text style={[styles.buttonText, canContinue && { color: colors.yellow }]}>
               {step === 'phone' ? 'Continuer' : 'Valider'}
             </Text>
-            <Ionicons name="arrow-forward" size={20} color={canContinue ? colors.yellow : '#9AAACB'} />
+            <Ionicons name="arrow-forward" size={20} color={canContinue ? colors.yellow : '#9E9E9E'} />
           </Pressable>
         </View>
       </KeyboardAvoidingView>
@@ -148,7 +148,7 @@ export function LoginSheet() {
 
 const styles = StyleSheet.create({
   // Voile bleu nuit : un voile noir sur le jaune donnerait un kaki terne.
-  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(11,45,111,0.82)' },
+  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.82)' },
   sheetWrap: { flex: 1, justifyContent: 'flex-end' },
   sheet: {
     backgroundColor: colors.white,
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 5,
     borderRadius: 3,
-    backgroundColor: '#D5DEEC',
+    backgroundColor: '#D6D6D6',
     marginBottom: 18,
   },
   badge: {
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   codeBoxFilled: { borderColor: colors.navy, backgroundColor: colors.white },
-  codeBoxCurrent: { borderColor: colors.yellow, borderWidth: 2.5, backgroundColor: colors.white },
+  codeBoxCurrent: { borderColor: colors.navy, borderWidth: 2.5, backgroundColor: colors.white },
   codeDigit: { color: colors.navy, fontSize: 24, fontWeight: '700' },
   hiddenInput: { position: 'absolute', width: 1, height: 1, opacity: 0 },
   demo: {
@@ -240,6 +240,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   buttonActive: { backgroundColor: colors.navy },
-  buttonDisabled: { backgroundColor: '#EDF1F7' },
-  buttonText: { fontSize: 17, fontWeight: '600', color: '#9AAACB' },
+  buttonDisabled: { backgroundColor: '#EEEEEE' },
+  buttonText: { fontSize: 17, fontWeight: '600', color: '#9E9E9E' },
 });

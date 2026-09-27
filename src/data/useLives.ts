@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { lives as demoLives, type Live } from './mock';
 
-const palette = ['#FF7A59', '#2EB67D', '#3D7BF7', '#A259FF', '#0B2D6F', '#E84A8A'];
+const palette = ['#2B2B2B', '#4A4A4A', '#1A1A1A', '#5C5C5C', '#333333', '#3D3D3D'];
 
 type LiveRow = {
   id: string;

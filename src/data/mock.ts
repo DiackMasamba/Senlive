@@ -27,12 +27,12 @@ export const categories: Category[] = [
 ];
 
 export const lives: Live[] = [
-  { id: '1', title: 'Sabar night en direct de Dakar', host: 'Awa Ndiaye', handle: '@awa.sabar', category: 'musique', viewers: 1240, premium: false, color: '#FF7A59' },
-  { id: '2', title: 'Thiéboudienne de A à Z', host: 'Chef Mamadou', handle: '@chefmamadou', category: 'cuisine', viewers: 860, premium: true, color: '#2EB67D' },
-  { id: '3', title: 'Débrief Lions du Sénégal', host: 'Ibou Sport', handle: '@ibousport', category: 'sport', viewers: 2310, premium: false, color: '#3D7BF7' },
-  { id: '4', title: 'Sketchs et questions du public', host: 'Fatou Rire', handle: '@fatourire', category: 'humour', viewers: 540, premium: true, color: '#A259FF' },
-  { id: '5', title: 'Lancer son business à 0 FCFA', host: 'Moussa Pro', handle: '@moussapro', category: 'business', viewers: 390, premium: true, color: '#0B2D6F' },
-  { id: '6', title: 'Routine beauté du soir', host: 'Khady Glow', handle: '@khadyglow', category: 'lifestyle', viewers: 715, premium: false, color: '#E84A8A' },
+  { id: '1', title: 'Sabar night en direct de Dakar', host: 'Awa Ndiaye', handle: '@awa.sabar', category: 'musique', viewers: 1240, premium: false, color: '#2B2B2B' },
+  { id: '2', title: 'Thiéboudienne de A à Z', host: 'Chef Mamadou', handle: '@chefmamadou', category: 'cuisine', viewers: 860, premium: true, color: '#4A4A4A' },
+  { id: '3', title: 'Débrief Lions du Sénégal', host: 'Ibou Sport', handle: '@ibousport', category: 'sport', viewers: 2310, premium: false, color: '#1A1A1A' },
+  { id: '4', title: 'Sketchs et questions du public', host: 'Fatou Rire', handle: '@fatourire', category: 'humour', viewers: 540, premium: true, color: '#5C5C5C' },
+  { id: '5', title: 'Lancer son business à 0 FCFA', host: 'Moussa Pro', handle: '@moussapro', category: 'business', viewers: 390, premium: true, color: '#333333' },
+  { id: '6', title: 'Routine beauté du soir', host: 'Khady Glow', handle: '@khadyglow', category: 'lifestyle', viewers: 715, premium: false, color: '#3D3D3D' },
 ];
 
 export const chatSeed = [

@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   statHead: { flexDirection: 'row', gap: 6, alignItems: 'flex-start' },
   statLabel: { color: colors.navy, fontSize: 13, fontWeight: '700' },
   statValue: { color: colors.navy, fontSize: 13 },
-  progress: { height: 4, borderRadius: 2, backgroundColor: 'rgba(11,45,111,0.15)' },
+  progress: { height: 4, borderRadius: 2, backgroundColor: 'rgba(0,0,0,0.15)' },
   progressFill: { height: 4, borderRadius: 2, backgroundColor: colors.navy },
   details: {
     alignSelf: 'flex-end',
