@@ -4,10 +4,12 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '../../components/AppText';
 import { Header } from '../../components/Header';
 import { LiveCard } from '../../components/LiveCard';
-import { categories, lives } from '../../data/mock';
+import { categories } from '../../data/mock';
+import { useLives } from '../../data/useLives';
 import { colors, radius } from '../../theme';
 
 export default function ExplorerScreen() {
+  const { lives } = useLives();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string | null>(null);
 
@@ -18,7 +20,7 @@ export default function ExplorerScreen() {
         (!category || l.category === category) &&
         (!q || l.title.toLowerCase().includes(q) || l.host.toLowerCase().includes(q) || l.handle.includes(q)),
     );
-  }, [query, category]);
+  }, [lives, query, category]);
 
   return (
     <View style={styles.screen}>

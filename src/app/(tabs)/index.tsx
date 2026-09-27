@@ -9,10 +9,12 @@ import { Logo } from '../../components/Logo';
 import { SectionTitle } from '../../components/SectionTitle';
 import { Tile } from '../../components/Tile';
 import { useSession } from '../../context/session';
-import { categories, lives } from '../../data/mock';
+import { categories } from '../../data/mock';
+import { useLives } from '../../data/useLives';
 import { colors, radius, shadow } from '../../theme';
 
 export default function HomeScreen() {
+  const { lives } = useLives();
   const { user, subscription, openLogin } = useSession();
   const [hidden, setHidden] = useState(true);
 

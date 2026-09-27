@@ -5,11 +5,13 @@ import { FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, View }
 import { Text, TextInput } from '../../components/AppText';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSession } from '../../context/session';
-import { chatSeed, formatViewers, lives } from '../../data/mock';
+import { chatSeed, formatViewers } from '../../data/mock';
+import { useLives } from '../../data/useLives';
 import { colors, radius } from '../../theme';
 
 // Écran de visionnage : vidéo plein écran (simulée) et chat en surimpression.
 export default function LiveScreen() {
+  const { lives } = useLives();
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { user, subscription, openLogin } = useSession();
