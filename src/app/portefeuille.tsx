@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '../components/AppText';
 import { type PaymentMethod, useSession } from '../context/session';
 import { useWallet } from '../context/wallet';
-import { payCoinPack } from '../lib/paydunya';
+import { payCoinPack } from '../lib/paytech';
 import { COIN_FCFA, coinPacks, MIN_WITHDRAW_DIAMONDS, packBonus, REFERRAL_RATE } from '../data/coins';
 import { colors, formatFcfa, radius } from '../theme';
 

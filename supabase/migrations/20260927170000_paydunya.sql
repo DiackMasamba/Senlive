@@ -1,4 +1,4 @@
--- Recharge de pièces via PayDunya : seule la fonction serveur (service_role) peut valider un paiement.
+-- Recharge de pièces (PayTech) : seule la fonction serveur (service_role) peut valider un paiement.
 create function private.complete_coin_payment(p_provider_ref text, p_amount integer)
 returns uuid
 language plpgsql
