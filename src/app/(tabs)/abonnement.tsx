@@ -5,7 +5,7 @@ import { Text } from '../../components/AppText';
 import { Header } from '../../components/Header';
 import { type PaymentMethod, useSession } from '../../context/session';
 import { SUBSCRIPTION_PRICE } from '../../data/mock';
-import { colors, formatFcfa, radius, shadow } from '../../theme';
+import { colors, formatFcfa } from '../../theme';
 
 const methods: { id: PaymentMethod; label: string; hint: string; color: string; icon: keyof typeof Ionicons.glyphMap }[] = [
   { id: 'wave', label: 'Wave', hint: 'Paiement confirmé dans ton app Wave', color: '#1DC8F2', icon: 'water-outline' },
@@ -29,24 +29,31 @@ export default function SubscriptionScreen() {
     <View style={styles.screen}>
       <Header />
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.offer}>
-          <View style={styles.offerBlob} />
-          <Text style={styles.offerName}>Senlive Premium</Text>
-          <Text style={styles.price}>
-            {formatFcfa(SUBSCRIPTION_PRICE)}
-            <Text style={styles.per}> / mois</Text>
-          </Text>
-          {perks.map((p) => (
-            <View key={p} style={styles.perk}>
-              <Ionicons name="checkmark-circle" size={20} color={colors.navy} />
-              <Text style={styles.perkText}>{p}</Text>
-            </View>
-          ))}
+        <View style={styles.block}>
+          <View style={styles.offer}>
+            <View style={styles.offerRing} />
+            <Text style={styles.kicker}>SENLIVE PREMIUM</Text>
+            <Text style={styles.price}>
+              {formatFcfa(SUBSCRIPTION_PRICE)}
+              <Text style={styles.per}> / mois</Text>
+            </Text>
+            <Text style={styles.offerSub}>Sans engagement, résiliable à tout moment</Text>
+          </View>
+          <View style={styles.perks}>
+            {perks.map((p) => (
+              <View key={p} style={styles.perk}>
+                <Ionicons name="checkmark" size={17} color={colors.navy} />
+                <Text style={styles.perkText}>{p}</Text>
+              </View>
+            ))}
+          </View>
         </View>
 
         {subscription ? (
-          <View style={styles.active}>
-            <Ionicons name="star" size={28} color={colors.yellow} />
+          <View style={[styles.block, styles.active]}>
+            <View style={styles.activeIcon}>
+              <Ionicons name="star" size={18} color={colors.white} />
+            </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.activeTitle}>Premium actif</Text>
               <Text style={styles.activeText}>
@@ -54,42 +61,45 @@ export default function SubscriptionScreen() {
                 {methods.find((m) => m.id === subscription.method)?.label}
               </Text>
             </View>
-            <Pressable onPress={cancelSubscription}>
+            <Pressable onPress={cancelSubscription} hitSlop={8}>
               <Text style={styles.cancel}>Résilier</Text>
             </Pressable>
           </View>
         ) : (
-          <>
-            <Text style={styles.sectionTitle}>Choisis ton moyen de paiement</Text>
+          <View style={styles.block}>
+            <Text style={styles.sectionTitle}>MOYEN DE PAIEMENT</Text>
             {methods.map((m) => {
               const selected = method === m.id;
               return (
-                <Pressable key={m.id} onPress={() => setMethod(m.id)} style={[styles.method, selected && styles.methodSelected]}>
+                <Pressable key={m.id} onPress={() => setMethod(m.id)} style={styles.method}>
                   <View style={[styles.methodIcon, { backgroundColor: m.color }]}>
-                    <Ionicons name={m.icon} size={22} color={colors.white} />
+                    <Ionicons name={m.icon} size={18} color={colors.white} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.methodLabel}>{m.label}</Text>
-                    <Text style={styles.methodHint}>{m.hint}</Text>
+                    <Text style={styles.methodHint} numberOfLines={1}>
+                      {m.hint}
+                    </Text>
                   </View>
                   <Ionicons
                     name={selected ? 'radio-button-on' : 'radio-button-off'}
-                    size={24}
+                    size={21}
                     color={selected ? colors.navy : colors.border}
                   />
                 </Pressable>
               );
             })}
-            <Pressable style={styles.pay} onPress={() => (user ? subscribe(method) : openLogin())}>
-              <Text style={styles.payText}>
-                {user ? `Payer ${formatFcfa(SUBSCRIPTION_PRICE)}` : 'Connecte-toi pour t’abonner'}
+            <View style={styles.payWrap}>
+              <Pressable style={styles.pay} onPress={() => (user ? subscribe(method) : openLogin())}>
+                <Text style={styles.payText}>
+                  {user ? `Payer ${formatFcfa(SUBSCRIPTION_PRICE)}` : 'Connecte-toi pour t’abonner'}
+                </Text>
+              </Pressable>
+              <Text style={styles.note}>
+                Rappel 3 jours avant chaque échéance. Sans paiement, tu gardes l’accès 3 jours de plus.
               </Text>
-              <Ionicons name="arrow-forward" size={20} color={colors.white} />
-            </Pressable>
-            <Text style={styles.note}>
-              Rappel 3 jours avant chaque échéance. Sans paiement, tu gardes l’accès 3 jours de plus. Résiliable à tout moment.
-            </Text>
-          </>
+            </View>
+          </View>
         )}
       </ScrollView>
     </View>
@@ -97,67 +107,75 @@ export default function SubscriptionScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.background },
-  content: { padding: 20, paddingBottom: 40 },
+  screen: { flex: 1, backgroundColor: colors.surface },
+  content: { paddingBottom: 110, gap: 8 },
+  block: { backgroundColor: colors.white },
   offer: {
-    backgroundColor: colors.yellow,
-    borderRadius: 32,
-    padding: 24,
+    margin: 14,
+    marginBottom: 4,
+    borderRadius: 14,
+    backgroundColor: colors.navy,
+    padding: 16,
     overflow: 'hidden',
-    gap: 8,
-    ...shadow,
   },
-  offerBlob: {
+  offerRing: {
     position: 'absolute',
-    width: 260,
-    height: 260,
-    borderRadius: 130,
-    right: -110,
-    top: -70,
-    backgroundColor: colors.yellowLight,
+    width: 190,
+    height: 190,
+    borderRadius: 95,
+    borderWidth: 28,
+    borderColor: 'rgba(255,255,255,0.07)',
+    right: -50,
+    top: -40,
   },
-  offerName: { color: colors.navy, fontSize: 18, fontWeight: '600' },
-  price: { color: colors.navy, fontSize: 34, fontWeight: '900', marginBottom: 8 },
-  per: { fontSize: 16, fontWeight: '500' },
-  perk: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  perkText: { color: colors.navy, fontSize: 15 },
-  sectionTitle: { color: colors.navy, fontSize: 18, fontWeight: '800', marginTop: 28, marginBottom: 12 },
+  kicker: { color: colors.live, fontSize: 11, fontWeight: '700', letterSpacing: 0.8 },
+  price: { color: colors.white, fontSize: 26, fontWeight: '700', marginTop: 4 },
+  per: { fontSize: 14, fontWeight: '400' },
+  offerSub: { color: 'rgba(255,255,255,0.7)', fontSize: 12.5, marginTop: 2 },
+  perks: { paddingHorizontal: 14, paddingTop: 8, paddingBottom: 12 },
+  perk: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 5 },
+  perkText: { color: colors.navy, fontSize: 14 },
+  sectionTitle: {
+    color: colors.textMuted,
+    fontSize: 12.5,
+    fontWeight: '600',
+    letterSpacing: 0.3,
+    paddingHorizontal: 14,
+    paddingTop: 14,
+    paddingBottom: 4,
+  },
   method: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
-    padding: 14,
-    borderRadius: radius.md,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    marginBottom: 10,
+    gap: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
-  methodSelected: { borderColor: colors.navy, backgroundColor: colors.yellowPale },
-  methodIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  methodLabel: { color: colors.navy, fontSize: 16, fontWeight: '700' },
-  methodHint: { color: colors.textMuted, fontSize: 13 },
+  methodIcon: { width: 34, height: 34, borderRadius: 9, alignItems: 'center', justifyContent: 'center' },
+  methodLabel: { color: colors.navy, fontSize: 14.5, fontWeight: '600' },
+  methodHint: { color: colors.textMuted, fontSize: 12 },
+  payWrap: { padding: 14 },
   pay: {
-    flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
-    gap: 10,
+    height: 46,
     backgroundColor: colors.navy,
-    borderRadius: radius.pill,
-    paddingVertical: 16,
-    marginTop: 12,
+    borderRadius: 10,
   },
-  payText: { color: colors.white, fontSize: 17, fontWeight: '600' },
-  note: { color: colors.textMuted, fontSize: 13, textAlign: 'center', marginTop: 14, lineHeight: 18 },
-  active: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    marginTop: 24,
-    padding: 18,
-    borderRadius: radius.md,
+  payText: { color: colors.white, fontSize: 15, fontWeight: '600' },
+  note: { color: colors.textMuted, fontSize: 12, textAlign: 'center', marginTop: 10, lineHeight: 17 },
+  active: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14 },
+  activeIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: colors.navy,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  activeTitle: { color: colors.yellow, fontSize: 18, fontWeight: '800' },
-  activeText: { color: colors.white, fontSize: 14, marginTop: 2 },
-  cancel: { color: colors.yellowLight, textDecorationLine: 'underline' },
+  activeTitle: { color: colors.navy, fontSize: 15, fontWeight: '700' },
+  activeText: { color: colors.textMuted, fontSize: 12.5, marginTop: 1 },
+  cancel: { color: colors.live, fontSize: 13, fontWeight: '600' },
 });
