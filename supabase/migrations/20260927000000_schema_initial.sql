@@ -26,21 +26,39 @@ create table public.profiles (
 );
 
 -- Création automatique du profil à l'inscription (téléphone vérifié par OTP).
-create function public.handle_new_user()
+-- Le trigger on_auth_user_created appelle private.handle_new_user().
+create schema if not exists private;
+
+create or replace function private.handle_new_user()
 returns trigger
 language plpgsql
 security definer
 set search_path = ''
 as $$
+declare
+  v_phone text := nullif(new.phone, '');
 begin
-  insert into public.profiles (id, phone) values (new.id, new.phone);
+  if v_phone is not null and left(v_phone, 1) <> '+' then
+    v_phone := '+' || v_phone;
+  end if;
+  insert into public.profiles (id, phone) values (new.id, v_phone);
   return new;
 end;
 $$;
 
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute function public.handle_new_user();
+revoke execute on function private.handle_new_user() from anon, authenticated, public;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_trigger
+    where tgrelid = 'auth.users'::regclass and tgname = 'on_auth_user_created'
+  ) then
+    create trigger on_auth_user_created
+      after insert on auth.users
+      for each row execute function private.handle_new_user();
+  end if;
+end $$;
 
 -- Catégories -------------------------------------------------------------
 create table public.categories (
@@ -192,7 +210,7 @@ create policy "Un créateur validé crée ses lives" on public.lives
   );
 create policy "Le créateur gère ses lives" on public.lives
   for update to authenticated
-  using (host_id = (select auth.uid()))
+  using (host_id = (select auth.uid()) and status <> 'cut')
   with check (host_id = (select auth.uid()) and status <> 'cut');
 
 create policy "Messages visibles des membres" on public.live_messages
@@ -227,6 +245,5 @@ create policy "Signaler en son nom" on public.reports
 create policy "Voir ses signalements" on public.reports
   for select to authenticated using (reporter_id = (select auth.uid()));
 
-revoke execute on function public.handle_new_user() from anon, authenticated, public;
 revoke execute on function public.is_subscriber() from anon, public;
 grant execute on function public.is_subscriber() to authenticated;
