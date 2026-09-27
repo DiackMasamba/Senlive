@@ -2,6 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from './AppText';
+import { Avatar } from './Avatar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSession } from '../context/session';
 import { colors } from '../theme';
@@ -18,7 +19,7 @@ export function Wordmark() {
 
 export function Header() {
   const insets = useSafeAreaInsets();
-  const { user, openLogin, openMenu } = useSession();
+  const { user, avatar, openLogin, openMenu } = useSession();
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + 10 }]}>
@@ -42,7 +43,11 @@ export function Header() {
           onPress={() => (user ? router.navigate('/compte') : openLogin())}
           accessibilityLabel={user ? 'Mon compte' : 'Connexion'}
         >
-          <Ionicons name={user ? 'person-circle-outline' : 'person-outline'} size={25} color={colors.navy} />
+          {user && avatar ? (
+            <Avatar uri={avatar} size={27} />
+          ) : (
+            <Ionicons name={user ? 'person-circle-outline' : 'person-outline'} size={25} color={colors.navy} />
+          )}
           {user && <View style={styles.online} />}
         </Pressable>
       </View>

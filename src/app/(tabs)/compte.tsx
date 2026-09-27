@@ -2,18 +2,27 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../../components/AppText';
+import { Avatar } from '../../components/Avatar';
 import { Header } from '../../components/Header';
+import { pickImage } from '../../lib/pickImage';
 import { useSession } from '../../context/session';
 import { colors, radius } from '../../theme';
 
 export default function AccountScreen() {
-  const { user, subscription, openLogin, signOut } = useSession();
+  const { user, subscription, avatar, setAvatar, openLogin, signOut } = useSession();
+
+  const changePhoto = async () => {
+    if (!user) return openLogin();
+    const uri = await pickImage([1, 1]);
+    if (uri) setAvatar(uri);
+  };
 
   type Row = { icon: keyof typeof Ionicons.glyphMap; label: string; onPress?: () => void };
   const sections: { title: string; rows: Row[] }[] = [
     {
       title: 'MON COMPTE',
       rows: [
+        { icon: 'camera-outline', label: avatar ? 'Changer ma photo' : 'Ajouter une photo de profil', onPress: changePhoto },
         { icon: 'create-outline', label: 'Modifier mon profil' },
         { icon: 'star-outline', label: subscription ? 'Mon abonnement Premium' : 'Passer Premium', onPress: () => router.navigate('/abonnement') },
         { icon: 'videocam-outline', label: 'Devenir créateur', onPress: () => router.navigate('/golive') },
@@ -34,9 +43,12 @@ export default function AccountScreen() {
       <Header />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.profile}>
-          <View style={styles.avatar}>
-            <Ionicons name="person" size={26} color={colors.navySoft} />
-          </View>
+          <Pressable onPress={changePhoto} accessibilityLabel="Changer la photo de profil">
+            <Avatar uri={avatar} name={user?.name} size={52} />
+            <View style={styles.camera}>
+              <Ionicons name="camera" size={12} color={colors.white} />
+            </View>
+          </Pressable>
           <View style={{ flex: 1 }}>
             <Text style={styles.name}>{user ? user.name : 'Invité'}</Text>
             <Text style={styles.phone} numberOfLines={1}>
@@ -88,11 +100,16 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   content: { paddingBottom: 40 },
   profile: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 18, paddingTop: 16, paddingBottom: 10 },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#E3E3E3',
+  camera: {
+    position: 'absolute',
+    right: -2,
+    bottom: -2,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: colors.navy,
+    borderWidth: 2,
+    borderColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
   },

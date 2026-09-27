@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSession } from '../context/session';
 import { supabase } from '../lib/supabase';
 import { lives as demoLives, type Live } from './mock';
 
@@ -10,11 +11,13 @@ type LiveRow = {
   category_id: string;
   is_premium: boolean;
   viewer_count: number;
-  host: { username: string | null; display_name: string | null } | null;
+  thumbnail_url: string | null;
+  host: { username: string | null; display_name: string | null; avatar_url: string | null } | null;
 };
 
 // Lives en cours depuis Supabase ; tant qu'il n'y en a aucun, on montre les lives de démo.
 export function useLives() {
+  const { myLive } = useSession();
   const [lives, setLives] = useState<Live[]>(demoLives);
   const [isDemo, setIsDemo] = useState(true);
 
@@ -23,7 +26,9 @@ export function useLives() {
     let cancelled = false;
     supabase
       .from('lives')
-      .select('id, title, category_id, is_premium, viewer_count, host:profiles!lives_host_id_fkey(username, display_name)')
+      .select(
+        'id, title, category_id, is_premium, viewer_count, thumbnail_url, host:profiles!lives_host_id_fkey(username, display_name, avatar_url)',
+      )
       .eq('status', 'live')
       .order('viewer_count', { ascending: false })
       .limit(50)
@@ -39,6 +44,8 @@ export function useLives() {
             viewers: row.viewer_count,
             premium: row.is_premium,
             color: palette[i % palette.length],
+            thumbnail: row.thumbnail_url ?? undefined,
+            avatar: row.host?.avatar_url ?? undefined,
           })),
         );
         setIsDemo(false);
@@ -48,5 +55,6 @@ export function useLives() {
     };
   }, []);
 
-  return { lives, isDemo };
+  // Le live lancé depuis l'onglet Go Live apparaît en tête de liste.
+  return { lives: myLive ? [myLive, ...lives] : lives, isDemo };
 }

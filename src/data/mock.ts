@@ -11,6 +11,9 @@ export type Live = {
   viewers: number;
   premium: boolean;
   color: string;
+  // Photos : miniature du live et photo du créateur (URL Supabase Storage ou fichier local).
+  thumbnail?: string;
+  avatar?: string;
 };
 
 export const SUBSCRIPTION_PRICE = 2000;

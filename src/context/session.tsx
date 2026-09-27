@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import type { Live } from '../data/mock';
 
 export type PaymentMethod = 'wave' | 'orange-money' | 'carte';
 
@@ -11,6 +12,11 @@ type SessionValue = {
   subscription: Subscription;
   loginVisible: boolean;
   menuVisible: boolean;
+  avatar: string | null;
+  setAvatar: (uri: string | null) => void;
+  myLive: Live | null;
+  startLive: (live: Live) => void;
+  endLive: () => void;
   openLogin: () => void;
   closeLogin: () => void;
   openMenu: () => void;
@@ -29,6 +35,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [subscription, setSubscription] = useState<Subscription>(null);
   const [loginVisible, setLoginVisible] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const [myLive, setMyLive] = useState<Live | null>(null);
 
   const value = useMemo<SessionValue>(
     () => ({
@@ -36,6 +44,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       subscription,
       loginVisible,
       menuVisible,
+      avatar,
+      setAvatar,
+      myLive,
+      startLive: setMyLive,
+      endLive: () => setMyLive(null),
       openLogin: () => {
         setMenuVisible(false);
         setLoginVisible(true);
@@ -50,6 +63,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       signOut: () => {
         setUser(null);
         setSubscription(null);
+        setAvatar(null);
+        setMyLive(null);
         setMenuVisible(false);
       },
       subscribe: (method) => {
@@ -59,7 +74,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       },
       cancelSubscription: () => setSubscription(null),
     }),
-    [user, subscription, loginVisible, menuVisible],
+    [user, subscription, loginVisible, menuVisible, avatar, myLive],
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

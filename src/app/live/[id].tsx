@@ -1,8 +1,11 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, FlatList, Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '../../components/AppText';
+import { Avatar } from '../../components/Avatar';
+import { GiftSheet } from '../../components/GiftSheet';
+import type { Gift } from '../../data/gifts';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSession } from '../../context/session';
 import { chatSeed, formatViewers } from '../../data/mock';
@@ -16,9 +19,29 @@ export default function LiveScreen() {
   const insets = useSafeAreaInsets();
   const { user, subscription, openLogin } = useSession();
   const live = lives.find((l) => l.id === id) ?? lives[0];
-  const [messages, setMessages] = useState(chatSeed);
+  const [messages, setMessages] = useState<{ id: string; user: string; text: string; gift?: boolean }[]>(chatSeed);
   const [draft, setDraft] = useState('');
   const [likes, setLikes] = useState(0);
+  const [giftsOpen, setGiftsOpen] = useState(false);
+  const [burst, setBurst] = useState<Gift | null>(null);
+  const [received, setReceived] = useState(0);
+  const anim = useRef(new Animated.Value(0)).current;
+
+  // Le cadeau envoyé monte au centre de l'écran puis s'efface.
+  useEffect(() => {
+    if (!burst) return;
+    anim.setValue(0);
+    Animated.timing(anim, { toValue: 1, duration: 1800, useNativeDriver: true }).start(() => setBurst(null));
+  }, [burst, anim]);
+
+  const openGifts = () => (user ? setGiftsOpen(true) : openLogin());
+
+  const sendGift = (gift: Gift) => {
+    setGiftsOpen(false);
+    setMessages((m) => [...m, { id: String(Date.now()), user: 'Moi', text: `a envoyé ${gift.emoji} ${gift.label}`, gift: true }]);
+    setReceived((n) => n + gift.price);
+    setBurst(gift);
+  };
 
   const locked = live.premium && !subscription;
 
@@ -35,13 +58,12 @@ export default function LiveScreen() {
       style={[styles.screen, { backgroundColor: live.color }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
+      {live.thumbnail && <Image source={{ uri: live.thumbnail }} style={StyleSheet.absoluteFill} resizeMode="cover" />}
       <View style={styles.shade} />
 
       <View style={[styles.top, { paddingTop: insets.top + 10 }]}>
         <View style={styles.hostPill}>
-          <View style={styles.hostAvatar}>
-            <Text style={styles.hostInitial}>{live.host[0]}</Text>
-          </View>
+          <Avatar uri={live.avatar} name={live.host} size={36} />
           <View>
             <Text style={styles.hostName}>{live.host}</Text>
             <Text style={styles.hostHandle}>{live.handle}</Text>
@@ -51,6 +73,12 @@ export default function LiveScreen() {
           </Pressable>
         </View>
         <View style={styles.topRight}>
+          {received > 0 && (
+            <View style={styles.viewers}>
+              <Ionicons name="gift" size={13} color={colors.white} />
+              <Text style={styles.viewersText}>{received.toLocaleString('fr-FR')}</Text>
+            </View>
+          )}
           <View style={styles.viewers}>
             <Ionicons name="eye-outline" size={14} color={colors.white} />
             <Text style={styles.viewersText}>{formatViewers(live.viewers)}</Text>
@@ -95,9 +123,9 @@ export default function LiveScreen() {
           keyExtractor={(m) => m.id}
           style={styles.chat}
           renderItem={({ item }) => (
-            <View style={styles.message}>
-              <Text style={styles.messageUser}>{item.user} </Text>
-              <Text style={styles.messageText}>{item.text}</Text>
+            <View style={[styles.message, item.gift && styles.giftMessage]}>
+              <Text style={[styles.messageUser, item.gift && styles.giftText]}>{item.user} </Text>
+              <Text style={[styles.messageText, item.gift && styles.giftText]}>{item.text}</Text>
             </View>
           )}
         />
@@ -112,12 +140,36 @@ export default function LiveScreen() {
             style={styles.input}
             editable={!locked}
           />
+          <Pressable style={styles.round} onPress={openGifts} accessibilityLabel="Envoyer un cadeau">
+            <Ionicons name="gift" size={22} color={colors.white} />
+          </Pressable>
           <Pressable style={styles.heart} onPress={() => setLikes((n) => n + 1)} accessibilityLabel="J'aime">
             <Ionicons name="heart" size={26} color={colors.live} />
             {likes > 0 && <Text style={styles.likes}>{likes}</Text>}
           </Pressable>
         </View>
       </View>
+      {burst && (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.burst,
+            {
+              opacity: anim.interpolate({ inputRange: [0, 0.15, 0.75, 1], outputRange: [0, 1, 1, 0] }),
+              transform: [
+                { translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [80, -60] }) },
+                { scale: anim.interpolate({ inputRange: [0, 0.2, 1], outputRange: [0.4, 1.15, 1] }) },
+              ],
+            },
+          ]}
+        >
+          <Text style={styles.burstEmoji}>{burst.emoji}</Text>
+          <Text style={styles.burstText}>
+            {burst.label} pour {live.host}
+          </Text>
+        </Animated.View>
+      )}
+      <GiftSheet visible={giftsOpen} host={live.host} onClose={() => setGiftsOpen(false)} onSend={sendGift} />
     </KeyboardAvoidingView>
   );
 }
@@ -135,20 +187,11 @@ const styles = StyleSheet.create({
     padding: 5,
     paddingRight: 6,
   },
-  hostAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.yellow,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  hostInitial: { color: colors.navy, fontWeight: '900', fontSize: 16 },
   hostName: { color: colors.white, fontWeight: '700', fontSize: 14 },
   hostHandle: { color: 'rgba(255,255,255,0.75)', fontSize: 11 },
   follow: { backgroundColor: colors.yellow, borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 6, marginLeft: 4 },
   followText: { color: colors.navy, fontWeight: '700', fontSize: 13 },
-  topRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  topRight: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   viewers: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -204,5 +247,27 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   heart: { alignItems: 'center' },
+  round: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  giftMessage: { backgroundColor: 'rgba(255,255,255,0.92)' },
+  giftText: { color: colors.navy },
+  burst: { position: 'absolute', left: 0, right: 0, top: '38%', alignItems: 'center' },
+  burstEmoji: { fontSize: 96, lineHeight: 110 },
+  burstText: {
+    color: colors.white,
+    fontSize: 15,
+    fontWeight: '700',
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 999,
+    overflow: 'hidden',
+  },
   likes: { color: colors.white, fontSize: 11, fontWeight: '700' },
 });

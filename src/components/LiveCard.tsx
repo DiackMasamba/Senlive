@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from './AppText';
 import { formatViewers, type Live } from '../data/mock';
 import { colors } from '../theme';
@@ -17,7 +17,14 @@ export function LiveCard({ live, width }: Props) {
   return (
     <Pressable style={[styles.card, width ? { width } : { flex: 1 }]} onPress={() => router.push(`/live/${live.id}`)}>
       <View style={[styles.thumb, { backgroundColor: live.color }]}>
-        <Text style={styles.initials}>{initials}</Text>
+        {live.thumbnail ? (
+          <>
+            <Image source={{ uri: live.thumbnail }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+            <View style={styles.shade} />
+          </>
+        ) : (
+          <Text style={styles.initials}>{initials}</Text>
+        )}
         <View style={styles.topRow}>
           <View style={styles.liveBadge}>
             <Text style={styles.liveText}>EN DIRECT</Text>
@@ -64,6 +71,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
   },
+  shade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.12)' },
   initials: { color: 'rgba(255,255,255,0.9)', fontSize: 34, fontWeight: '900' },
   topRow: { position: 'absolute', top: 10, left: 10, flexDirection: 'row', alignItems: 'center', gap: 5 },
   liveBadge: {
