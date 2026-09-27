@@ -58,7 +58,7 @@ export function LoginSheet() {
         <View style={styles.sheet}>
           <View style={styles.grabber} />
           <View style={styles.badge}>
-            <Ionicons name={step === 'phone' ? 'phone-portrait-outline' : 'chatbubble-ellipses-outline'} size={28} color={colors.navy} />
+            <Ionicons name={step === 'phone' ? 'phone-portrait-outline' : 'chatbubble-ellipses-outline'} size={22} color={colors.navy} />
           </View>
           {step === 'phone' ? (
             <>
@@ -119,7 +119,7 @@ export function LoginSheet() {
                 <Text style={styles.error}>{error}</Text>
               ) : (
                 <View style={styles.demo}>
-                  <Ionicons name="information-circle" size={18} color={colors.navy} />
+                  <Ionicons name="information-circle" size={16} color={colors.navy} />
                   <Text style={styles.demoText}>
                     Version démo : aucun SMS n'est envoyé, le code est <Text style={styles.strong}>123456</Text>
                   </Text>
@@ -138,7 +138,7 @@ export function LoginSheet() {
             <Text style={[styles.buttonText, canContinue && { color: colors.yellow }]}>
               {step === 'phone' ? 'Continuer' : 'Valider'}
             </Text>
-            <Ionicons name="arrow-forward" size={20} color={canContinue ? colors.yellow : '#9E9E9E'} />
+            <Ionicons name="arrow-forward" size={18} color={canContinue ? colors.yellow : '#9E9E9E'} />
           </Pressable>
         </View>
       </KeyboardAvoidingView>
@@ -147,99 +147,106 @@ export function LoginSheet() {
 }
 
 const styles = StyleSheet.create({
-  // Voile bleu nuit : un voile noir sur le jaune donnerait un kaki terne.
-  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.82)' },
+  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.6)' },
   sheetWrap: { flex: 1, justifyContent: 'flex-end' },
   sheet: {
     backgroundColor: colors.white,
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-    paddingHorizontal: 24,
-    paddingTop: 10,
-    paddingBottom: 32,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    paddingHorizontal: 18,
+    paddingTop: 8,
+    paddingBottom: 24,
   },
   grabber: {
     alignSelf: 'center',
-    width: 56,
-    height: 5,
-    borderRadius: 3,
+    width: 40,
+    height: 4,
+    borderRadius: 2,
     backgroundColor: '#D6D6D6',
-    marginBottom: 18,
+    marginBottom: 14,
   },
   badge: {
     alignSelf: 'center',
-    width: 60,
-    height: 60,
-    borderRadius: 20,
-    backgroundColor: colors.yellow,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
-    transform: [{ rotate: '-8deg' }],
-    marginBottom: 14,
+    marginBottom: 10,
   },
-  title: { textAlign: 'center', color: colors.navy, fontSize: 21, fontWeight: '700' },
-  subtitle: { textAlign: 'center', color: colors.textMuted, fontSize: 15, marginTop: 4, marginBottom: 20 },
+  title: { textAlign: 'center', color: colors.navy, fontSize: 17, fontWeight: '700' },
+  subtitle: { textAlign: 'center', color: colors.textMuted, fontSize: 13, marginTop: 2, marginBottom: 16 },
   strong: { color: colors.navy, fontWeight: '700' },
   field: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1.5,
+    height: 46,
+    borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
-    padding: 8,
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   prefix: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: colors.white,
-    borderRadius: radius.sm,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    height: '100%',
+    paddingHorizontal: 12,
+    backgroundColor: colors.surface,
+    borderRightWidth: 1,
+    borderRightColor: colors.border,
   },
-  flag: { fontSize: 20 },
-  prefixText: { color: colors.navy, fontSize: 16, fontWeight: '600' },
-  input: { flex: 1, fontSize: 18, color: colors.navy, paddingHorizontal: 12, paddingVertical: 8, letterSpacing: 1 },
+  flag: { fontSize: 16 },
+  prefixText: { color: colors.navy, fontSize: 14, fontWeight: '600' },
+  input: {
+    flex: 1,
+    minWidth: 0,
+    height: '100%',
+    fontSize: 15,
+    color: colors.navy,
+    paddingHorizontal: 12,
+    letterSpacing: 0.5,
+    outlineStyle: 'none',
+  } as object,
   codeRow: { flexDirection: 'row', justifyContent: 'center', gap: 8 },
   codeBox: {
-    width: 46,
-    height: 56,
-    borderRadius: 14,
-    borderWidth: 1.5,
+    width: 42,
+    height: 48,
+    borderRadius: 10,
+    borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  codeBoxFilled: { borderColor: colors.navy, backgroundColor: colors.white },
-  codeBoxCurrent: { borderColor: colors.navy, borderWidth: 2.5, backgroundColor: colors.white },
-  codeDigit: { color: colors.navy, fontSize: 24, fontWeight: '700' },
+  codeBoxFilled: { borderColor: colors.navy },
+  codeBoxCurrent: { borderColor: colors.navy, borderWidth: 2 },
+  codeDigit: { color: colors.navy, fontSize: 20, fontWeight: '700' },
   hiddenInput: { position: 'absolute', width: 1, height: 1, opacity: 0 },
   demo: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: colors.yellowPale,
-    borderRadius: radius.sm,
+    backgroundColor: colors.surface,
+    borderRadius: 10,
     paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginTop: 16,
+    paddingVertical: 9,
+    marginTop: 14,
   },
-  demoText: { flex: 1, color: colors.navy, fontSize: 13 },
-  error: { color: colors.live, textAlign: 'center', marginTop: 16, fontSize: 14, fontWeight: '600' },
-  legal: { textAlign: 'center', color: colors.textMuted, fontSize: 12.5, marginTop: 16, lineHeight: 18 },
-  link: { color: colors.navySoft, textDecorationLine: 'underline' },
+  demoText: { flex: 1, color: colors.navy, fontSize: 12.5 },
+  error: { color: colors.live, textAlign: 'center', marginTop: 14, fontSize: 13, fontWeight: '600' },
+  legal: { textAlign: 'center', color: colors.textMuted, fontSize: 11.5, marginTop: 12, lineHeight: 16 },
+  link: { color: colors.navy, textDecorationLine: 'underline' },
   button: {
-    marginTop: 20,
-    borderRadius: radius.pill,
-    paddingVertical: 16,
+    marginTop: 16,
+    height: 46,
+    borderRadius: 10,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   buttonActive: { backgroundColor: colors.navy },
   buttonDisabled: { backgroundColor: '#EEEEEE' },
-  buttonText: { fontSize: 17, fontWeight: '600', color: '#9E9E9E' },
+  buttonText: { fontSize: 15, fontWeight: '600', color: '#9E9E9E' },
 });
