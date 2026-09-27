@@ -51,7 +51,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(timer);
   }, [myLive]);
 
-  const referralCode = user ? `SEN${user.phone.replace(/\D/g, '').slice(-4)}` : null;
+  // Code de démo stable par compte ; le vrai code vient de profiles.referral_code.
+  const referralCode = user
+    ? `SEN${String([...user.contact].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 10000, 7)).padStart(4, '0')}`
+    : null;
 
   const value = useMemo<WalletValue>(
     () => ({

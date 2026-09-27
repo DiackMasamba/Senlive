@@ -1,22 +1,20 @@
 import { supabase } from './supabase';
 
-// Connexion par SMS via Supabase Auth (fournisseur Twilio configuré dans le tableau de bord).
+// Connexion par code reçu par e-mail via Supabase Auth (gratuit). Le SMS (Twilio Verify) reviendra au lancement.
 // Sans Supabase configuré, l'app garde la connexion de démo (code 123456).
 export const realAuth = supabase !== null;
 
-const e164 = (digits: string) => `+221${digits}`;
-
-export async function sendOtp(digits: string): Promise<string | null> {
+export async function sendOtp(email: string): Promise<string | null> {
   if (!supabase) return null;
-  const { error } = await supabase.auth.signInWithOtp({ phone: e164(digits) });
+  const { error } = await supabase.auth.signInWithOtp({ email });
   if (!error) return null;
-  return error.status === 429 ? 'Trop de demandes. Réessaie dans une minute.' : "Impossible d'envoyer le SMS. Vérifie le numéro.";
+  return error.status === 429 ? 'Trop de demandes. Réessaie dans quelques minutes.' : "Impossible d'envoyer l'e-mail. Vérifie l'adresse.";
 }
 
 // Renvoie null si le code est faux, sinon le nom déjà enregistré (vide pour un nouveau compte).
-export async function verifyOtp(digits: string, token: string): Promise<{ name: string } | null> {
+export async function verifyOtp(email: string, token: string): Promise<{ name: string } | null> {
   if (!supabase) return null;
-  const { data, error } = await supabase.auth.verifyOtp({ phone: e164(digits), token, type: 'sms' });
+  const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email' });
   if (error || !data.user) return null;
   return { name: await profileName(data.user.id) };
 }

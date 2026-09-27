@@ -6,38 +6,36 @@ import { useSession } from '../context/session';
 import { realAuth, saveProfile, sendOtp, verifyOtp } from '../lib/auth';
 import { colors, radius } from '../theme';
 
-// Numéro sénégalais : 9 chiffres commençant par 7 (70, 75, 76, 77, 78).
-const isValidPhone = (digits: string) => /^7[05678]\d{7}$/.test(digits);
-const formatPhone = (digits: string) => digits.replace(/(\d{2})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4');
+const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
 
-// Tant que l'envoi de SMS n'est pas branché (lot 1), ce code de démo est accepté.
+// En démo (sans Supabase), ce code est accepté.
 const DEMO_CODE = '123456';
 const CODE_LENGTH = 6;
 
 export function LoginSheet() {
   const { loginVisible, closeLogin, signIn } = useSession();
   const [mode, setMode] = useState<'login' | 'signup'>('login');
-  const [step, setStep] = useState<'phone' | 'otp' | 'profile'>('phone');
+  const [step, setStep] = useState<'email' | 'otp' | 'profile'>('email');
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const codeInput = useRef<RNTextInput>(null);
 
-  const digits = phone.replace(/\D/g, '');
+  const cleanEmail = email.trim().toLowerCase();
   const cleanUsername = username.toLowerCase().replace(/[^a-z0-9._]/g, '');
   const canContinue =
-    step === 'phone'
-      ? isValidPhone(digits)
+    step === 'email'
+      ? isValidEmail(cleanEmail)
       : step === 'otp'
         ? code.length === CODE_LENGTH
         : name.trim().length >= 2 && cleanUsername.length >= 3;
 
   const reset = () => {
-    setStep('phone');
-    setPhone('');
+    setStep('email');
+    setEmail('');
     setCode('');
     setError('');
     setName('');
@@ -60,9 +58,8 @@ export function LoginSheet() {
   };
 
   const next = async () => {
-    const displayPhone = `+221 ${formatPhone(digits)}`;
-    if (step === 'phone') {
-      const failure = await sendOtp(digits);
+    if (step === 'email') {
+      const failure = await sendOtp(cleanEmail);
       if (failure) return setError(failure);
       setError('');
       setStep('otp');
@@ -71,7 +68,7 @@ export function LoginSheet() {
     if (step === 'otp') {
       let knownName = '';
       if (realAuth) {
-        const result = await verifyOtp(digits, code);
+        const result = await verifyOtp(cleanEmail, code);
         if (!result) {
           setError('Code incorrect ou expiré.');
           setCode('');
@@ -89,11 +86,11 @@ export function LoginSheet() {
         setStep('profile');
         return;
       }
-      signIn(displayPhone, knownName || undefined);
+      signIn(cleanEmail, knownName || undefined);
     } else {
       const failure = await saveProfile(name.trim(), cleanUsername);
       if (failure) return setError(failure);
-      signIn(displayPhone, name.trim());
+      signIn(cleanEmail, name.trim());
     }
     reset();
     setMode('login');
@@ -105,7 +102,7 @@ export function LoginSheet() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.sheetWrap} pointerEvents="box-none">
         <View style={styles.sheet}>
           <View style={styles.grabber} />
-          {step === 'phone' && (
+          {step === 'email' && (
             <View style={styles.tabs}>
               {(['login', 'signup'] as const).map((m) => (
                 <Pressable key={m} style={[styles.tab, mode === m && styles.tabActive]} onPress={() => setMode(m)}>
@@ -118,29 +115,30 @@ export function LoginSheet() {
           )}
           <View style={styles.badge}>
             <Ionicons
-              name={step === 'phone' ? 'phone-portrait-outline' : step === 'otp' ? 'chatbubble-ellipses-outline' : 'person-outline'}
+              name={step === 'email' ? 'mail-outline' : step === 'otp' ? 'chatbubble-ellipses-outline' : 'person-outline'}
               size={22}
               color={colors.navy}
             />
           </View>
-          {step === 'phone' ? (
+          {step === 'email' ? (
             <>
               <Text style={styles.title}>{mode === 'login' ? 'Déjà membre Senlive ?' : 'Crée ton compte Senlive'}</Text>
               <Text style={styles.subtitle}>
-                {mode === 'login' ? 'Entre ton numéro pour te connecter' : 'Gratuit, il suffit de ton numéro de téléphone'}
+                {mode === 'login' ? 'Entre ton e-mail pour te connecter' : 'Gratuit, il suffit de ton adresse e-mail'}
               </Text>
               <View style={styles.field}>
                 <View style={styles.prefix}>
-                  <Text style={styles.flag}>🇸🇳</Text>
-                  <Text style={styles.prefixText}>+221</Text>
+                  <Ionicons name="mail-outline" size={18} color={colors.navy} />
                 </View>
                 <TextInput
-                  value={phone}
-                  onChangeText={(t) => setPhone(t.replace(/[^\d ]/g, ''))}
-                  placeholder="77 123 45 67"
+                  value={email}
+                  onChangeText={(t) => setEmail(t.replace(/\s/g, ''))}
+                  placeholder="ton.email@exemple.com"
                   placeholderTextColor="#9E9E9E"
-                  keyboardType="phone-pad"
-                  maxLength={12}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  maxLength={120}
                   style={styles.input}
                   autoFocus
                 />
@@ -184,7 +182,7 @@ export function LoginSheet() {
             <>
               <Text style={styles.title}>Code de vérification</Text>
               <Text style={styles.subtitle}>
-                Envoyé par SMS au <Text style={styles.strong}>+221 {formatPhone(digits)}</Text>
+                Envoyé par e-mail à <Text style={styles.strong}>{cleanEmail}</Text>
               </Text>
               <Pressable style={styles.codeRow} onPress={() => codeInput.current?.focus()}>
                 {Array.from({ length: CODE_LENGTH }, (_, i) => {
@@ -216,16 +214,16 @@ export function LoginSheet() {
                 <View style={styles.demo}>
                   <Ionicons name="information-circle" size={16} color={colors.navy} />
                   {realAuth ? (
-                    <Text style={styles.demoText}>Code envoyé par SMS au +221 {formatPhone(digits)}</Text>
+                    <Text style={styles.demoText}>Regarde aussi dans les spams si tu ne le vois pas.</Text>
                   ) : (
                     <Text style={styles.demoText}>
-                      Version démo : aucun SMS n'est envoyé, le code est <Text style={styles.strong}>123456</Text>
+                      Version démo : aucun e-mail n'est envoyé, le code est <Text style={styles.strong}>123456</Text>
                     </Text>
                   )}
                 </View>
               )}
-              <Pressable onPress={() => setStep('phone')} hitSlop={8}>
-                <Text style={[styles.legal, styles.link]}>Modifier le numéro</Text>
+              <Pressable onPress={() => setStep('email')} hitSlop={8}>
+                <Text style={[styles.legal, styles.link]}>Modifier l'e-mail</Text>
               </Pressable>
             </>
           )}
@@ -236,7 +234,7 @@ export function LoginSheet() {
             style={[styles.button, canContinue ? styles.buttonActive : styles.buttonDisabled]}
           >
             <Text style={[styles.buttonText, canContinue && { color: colors.yellow }]}>
-              {step === 'phone' ? 'Continuer' : step === 'otp' ? 'Valider' : 'Créer mon compte'}
+              {step === 'email' ? 'Continuer' : step === 'otp' ? 'Valider' : 'Créer mon compte'}
             </Text>
             <Ionicons name="arrow-forward" size={18} color={canContinue ? colors.yellow : '#9E9E9E'} />
           </Pressable>

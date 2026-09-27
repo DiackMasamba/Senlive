@@ -59,7 +59,7 @@ export function SideMenu() {
             </Pressable>
 
             <Pressable style={styles.sectionLink} onPress={() => (user ? go('/compte') : openLogin())}>
-              <Text style={styles.sectionTitle}>{user ? `COMPTE ${user.phone}` : 'VOTRE COMPTE SENLIVE'}</Text>
+              <Text style={styles.sectionTitle}>{user ? `COMPTE ${user.contact}` : 'VOTRE COMPTE SENLIVE'}</Text>
               <Ionicons name="chevron-forward" size={18} color={colors.navy} />
             </Pressable>
             {accountItems.map((item) => (

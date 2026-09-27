@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 
 export type PaymentMethod = 'wave' | 'orange-money' | 'carte';
 
-type User = { phone: string; name: string };
+type User = { contact: string; name: string };
 
 type Subscription = { method: PaymentMethod; renewsOn: Date } | null;
 
@@ -23,7 +23,7 @@ type SessionValue = {
   closeLogin: () => void;
   openMenu: () => void;
   closeMenu: () => void;
-  signIn: (phone: string, name?: string) => void;
+  signIn: (contact: string, name?: string) => void;
   signOut: () => void;
   subscribe: (method: PaymentMethod) => void;
   cancelSubscription: () => void;
@@ -31,7 +31,7 @@ type SessionValue = {
 
 const SessionContext = createContext<SessionValue | null>(null);
 
-// Session de l'app : connexion par SMS via Supabase quand il est configuré, sinon état local de démo.
+// Session de l'app : connexion par code e-mail via Supabase quand il est configuré, sinon état local de démo.
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [subscription, setSubscription] = useState<Subscription>(null);
@@ -44,11 +44,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     supabase?.auth.getSession().then(async ({ data }) => {
       const u = data.session?.user;
-      if (!u?.phone) return;
+      const contact = u?.email || u?.phone;
+      if (!u || !contact) return;
       const name = await profileName(u.id);
-      if (!name) return;
-      const d = u.phone.replace(/\D/g, '').replace(/^221/, '');
-      setUser({ phone: `+221 ${d.replace(/(\d{2})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4')}`, name });
+      if (name) setUser({ contact, name });
     });
   }, []);
 
@@ -70,8 +69,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       closeLogin: () => setLoginVisible(false),
       openMenu: () => setMenuVisible(true),
       closeMenu: () => setMenuVisible(false),
-      signIn: (phone, name) => {
-        setUser({ phone, name: name || 'Membre Senlive' });
+      signIn: (contact, name) => {
+        setUser({ contact, name: name || 'Membre Senlive' });
         setLoginVisible(false);
       },
       signOut: () => {

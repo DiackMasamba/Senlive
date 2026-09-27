@@ -55,7 +55,7 @@ export default function AccountScreen() {
           <View style={{ flex: 1 }}>
             <Text style={styles.name}>{user ? user.name : 'Invité'}</Text>
             <Text style={styles.phone} numberOfLines={1}>
-              {user ? user.phone : 'Connecte-toi pour suivre tes créateurs'}
+              {user ? user.contact : 'Connecte-toi pour suivre tes créateurs'}
             </Text>
           </View>
           {!user && (
