@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 
 // Connexion par code reçu par e-mail via Supabase Auth (gratuit). Le SMS (Twilio Verify) reviendra au lancement.
-// Sans Supabase configuré, l'app garde la connexion de démo (code 123456).
+// Sans Supabase configuré, l'app garde la connexion de démo (code 12345678).
 export const realAuth = supabase !== null;
 
 export async function sendOtp(email: string): Promise<string | null> {

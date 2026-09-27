@@ -9,8 +9,8 @@ import { colors, radius } from '../theme';
 const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
 
 // En démo (sans Supabase), ce code est accepté.
-const DEMO_CODE = '123456';
-const CODE_LENGTH = 6;
+const DEMO_CODE = '12345678';
+const CODE_LENGTH = 8; // Supabase envoie des codes e-mail à 8 chiffres.
 
 export function LoginSheet() {
   const { loginVisible, closeLogin, signIn } = useSession();
@@ -76,7 +76,7 @@ export function LoginSheet() {
         }
         knownName = result.name;
       } else if (code !== DEMO_CODE) {
-        setError('Code incorrect. En démo, utilise 123456.');
+        setError('Code incorrect. En démo, utilise 12345678.');
         setCode('');
         return;
       }
@@ -217,7 +217,7 @@ export function LoginSheet() {
                     <Text style={styles.demoText}>Regarde aussi dans les spams si tu ne le vois pas.</Text>
                   ) : (
                     <Text style={styles.demoText}>
-                      Version démo : aucun e-mail n'est envoyé, le code est <Text style={styles.strong}>123456</Text>
+                      Version démo : aucun e-mail n'est envoyé, le code est <Text style={styles.strong}>12345678</Text>
                     </Text>
                   )}
                 </View>
@@ -318,9 +318,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     outlineStyle: 'none',
   } as object,
-  codeRow: { flexDirection: 'row', justifyContent: 'center', gap: 8 },
+  codeRow: { flexDirection: 'row', justifyContent: 'center', gap: 6 },
   codeBox: {
-    width: 42,
+    width: 36,
     height: 48,
     borderRadius: 10,
     borderWidth: 1,
