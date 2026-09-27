@@ -76,14 +76,15 @@ Fait :
 - Connexion par e-mail fonctionnelle (le code arrive bien).
 - PayTech branché côté serveur (clés vérifiées).
 - Premier APK Android installé sur le téléphone de Babacar.
-- Correctif : le clavier cachait les champs sur Android. Icône Senlive (s blanc et point rouge sur fond noir). Ces deux changements sont dans le 2e APK, en cours de compilation à la fin de la session.
+- 2e APK installé : clavier corrigé sur Android, icône Senlive. **Connexion par e-mail testée et validée sur le téléphone** ; créer un live fonctionne (il apparaît sur l'accueil).
+- Les lives n'ont **pas encore de vidéo** : ils affichent seulement la photo de couverture.
 
 ## Prochaines étapes
 
-1. Installer le 2e APK, puis tester la connexion par e-mail et une recharge PayTech en mode test.
+1. Tester une recharge PayTech en mode test depuis l'APK.
+1. **Vidéo en direct** (priorité suivante) : proposé LiveKit Cloud (offre gratuite, recommandé) ou Agora. Babacar crée le compte et saisit les clés lui-même. Il faudra un module natif et un nouvel APK.
 2. Relier le portefeuille de l'app aux tables Supabase `wallets` et `wallet_transactions`. Aujourd'hui le solde est local.
 3. Enregistrer les cadeaux envoyés côté serveur (`private.send_gift`).
-4. Vidéo en direct : choisir un service WebRTC géré (lot 2 du cahier des charges).
 5. Plus tard :
    - supprimer les anciennes fonctions `paydunya-*` dans Supabase ;
    - passer PayTech en production ;
