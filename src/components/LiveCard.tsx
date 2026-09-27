@@ -18,29 +18,35 @@ export function LiveCard({ live, width }: Props) {
     <Pressable style={[styles.card, width ? { width } : { flex: 1 }]} onPress={() => router.push(`/live/${live.id}`)}>
       <View style={[styles.thumb, { backgroundColor: live.color }]}>
         <Text style={styles.initials}>{initials}</Text>
-        <View style={styles.liveBadge}>
-          <Text style={styles.liveText}>EN DIRECT</Text>
+        <View style={styles.topRow}>
+          <View style={styles.liveBadge}>
+            <Text style={styles.liveText}>EN DIRECT</Text>
+          </View>
+          <View style={styles.viewers}>
+            <Ionicons name="eye-outline" size={12} color={colors.white} />
+            <Text style={styles.viewersText}>{formatViewers(live.viewers)}</Text>
+          </View>
         </View>
         {live.premium && (
           <View style={styles.premium}>
             <Ionicons name="star" size={12} color={colors.navy} />
           </View>
         )}
-        <View style={styles.viewers}>
-          <Ionicons name="eye-outline" size={13} color={colors.white} />
-          <Text style={styles.viewersText}>{formatViewers(live.viewers)}</Text>
+        <View style={styles.handle}>
+          <Text style={styles.handleText} numberOfLines={1}>
+            {live.handle}
+          </Text>
         </View>
       </View>
       <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
         {live.title}
       </Text>
-      <Text style={styles.host} numberOfLines={1}>{live.handle}</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { gap: 6 },
+  card: { gap: 5 },
   thumb: {
     height: 190,
     borderRadius: radius.md,
@@ -49,10 +55,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   initials: { color: 'rgba(255,255,255,0.9)', fontSize: 44, fontWeight: '900' },
+  topRow: { position: 'absolute', top: 10, left: 10, flexDirection: 'row', alignItems: 'center', gap: 5 },
   liveBadge: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
     backgroundColor: colors.live,
     borderRadius: 6,
     paddingHorizontal: 7,
@@ -61,28 +65,35 @@ const styles = StyleSheet.create({
   liveText: { color: colors.white, fontSize: 10, fontWeight: '800', letterSpacing: 0.5 },
   premium: {
     position: 'absolute',
-    top: 8,
+    bottom: 7,
     right: 8,
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     backgroundColor: colors.yellow,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  viewers: {
+  handle: {
     position: 'absolute',
     bottom: 8,
-    left: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    left: 8,
+    maxWidth: '72%',
+    backgroundColor: 'rgba(0,0,0,0.55)',
     borderRadius: 10,
     paddingHorizontal: 7,
     paddingVertical: 2,
   },
-  viewersText: { color: colors.white, fontSize: 12, fontWeight: '600' },
+  handleText: { color: colors.white, fontSize: 11, fontWeight: '600' },
+  viewers: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+  },
+  viewersText: { color: colors.white, fontSize: 10, fontWeight: '600' },
   title: { color: colors.navy, fontSize: 12.5, fontWeight: '600', lineHeight: 18 },
-  host: { color: colors.textMuted, fontSize: 12 },
 });
