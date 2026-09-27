@@ -26,7 +26,7 @@ export default function ExplorerScreen() {
     <View style={styles.screen}>
       <Header />
       <View style={styles.search}>
-        <Ionicons name="search-outline" size={20} color={colors.navySoft} />
+        <Ionicons name="search-outline" size={19} color={colors.navySoft} />
         <TextInput
           value={query}
           onChangeText={setQuery}
@@ -35,7 +35,7 @@ export default function ExplorerScreen() {
           style={styles.input}
         />
       </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips} style={{ flexGrow: 0 }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips} style={styles.chipsBar}>
         {[{ id: null, label: 'Tout' }, ...categories].map((c) => {
           const active = category === c.id;
           return (
@@ -45,7 +45,7 @@ export default function ExplorerScreen() {
           );
         })}
       </ScrollView>
-      <ScrollView contentContainerStyle={styles.grid}>
+      <ScrollView style={{ backgroundColor: colors.surface }} contentContainerStyle={styles.grid}>
         {results.map((live) => (
           <View key={live.id} style={styles.cell}>
             <LiveCard live={live} />
@@ -63,27 +63,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    margin: 20,
-    marginBottom: 12,
-    paddingHorizontal: 16,
+    marginHorizontal: 14,
+    marginTop: 12,
+    marginBottom: 10,
+    paddingHorizontal: 14,
+    height: 44,
     borderRadius: radius.pill,
     backgroundColor: colors.surface,
-    borderWidth: 1.2,
-    borderColor: colors.border,
   },
-  input: { flex: 1, paddingVertical: 12, fontSize: 16, color: colors.navy },
-  chips: { paddingHorizontal: 20, gap: 8, paddingBottom: 12 },
+  input: { flex: 1, height: 44, fontSize: 14, color: colors.navy, outlineStyle: 'none' } as object,
+  chipsBar: { flexGrow: 0, flexShrink: 0 },
+  chips: { paddingHorizontal: 14, gap: 8, paddingBottom: 10, alignItems: 'center' },
   chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    height: 32,
+    justifyContent: 'center',
+    paddingHorizontal: 14,
     borderRadius: radius.pill,
-    borderWidth: 1.2,
+    borderWidth: 1,
     borderColor: colors.border,
+    backgroundColor: colors.white,
   },
   chipActive: { backgroundColor: colors.navy, borderColor: colors.navy },
-  chipText: { color: colors.navy, fontSize: 14 },
-  chipTextActive: { color: colors.yellow, fontWeight: '700' },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 14, paddingBottom: 30 },
-  cell: { width: '50%', padding: 6 },
+  chipText: { color: colors.navy, fontSize: 13, lineHeight: 16 },
+  chipTextActive: { color: colors.white, fontWeight: '600' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 9, paddingBottom: 110, backgroundColor: colors.surface, paddingTop: 5 },
+  cell: { width: '50%', padding: 5 },
   empty: { color: colors.textMuted, padding: 20, fontSize: 15 },
 });

@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from './AppText';
 import { formatViewers, type Live } from '../data/mock';
-import { colors, radius } from '../theme';
+import { colors } from '../theme';
 
 type Props = { live: Live; width?: number };
 
@@ -38,23 +38,33 @@ export function LiveCard({ live, width }: Props) {
           </Text>
         </View>
       </View>
-      <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
-        {live.title}
-      </Text>
+      <View style={styles.info}>
+        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+          {live.title}
+        </Text>
+        <Text style={styles.host} numberOfLines={1}>
+          {live.host}
+        </Text>
+      </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { gap: 5 },
+  card: {
+    backgroundColor: colors.white,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: 'hidden',
+  },
   thumb: {
-    height: 190,
-    borderRadius: radius.md,
+    height: 170,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
   },
-  initials: { color: 'rgba(255,255,255,0.9)', fontSize: 44, fontWeight: '900' },
+  initials: { color: 'rgba(255,255,255,0.9)', fontSize: 34, fontWeight: '900' },
   topRow: { position: 'absolute', top: 10, left: 10, flexDirection: 'row', alignItems: 'center', gap: 5 },
   liveBadge: {
     backgroundColor: colors.live,
@@ -95,5 +105,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   viewersText: { color: colors.white, fontSize: 10, fontWeight: '600' },
-  title: { color: colors.navy, fontSize: 12.5, fontWeight: '600', lineHeight: 18 },
+  info: { paddingHorizontal: 9, paddingVertical: 8 },
+  title: { color: colors.navy, fontSize: 13, fontWeight: '500', lineHeight: 18 },
+  host: { color: colors.textMuted, fontSize: 11.5, marginTop: 1 },
 });
