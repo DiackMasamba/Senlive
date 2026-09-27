@@ -1,5 +1,7 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { Live } from '../data/mock';
+import { profileName, signOutRemote } from '../lib/auth';
+import { supabase } from '../lib/supabase';
 
 export type PaymentMethod = 'wave' | 'orange-money' | 'carte';
 
@@ -29,7 +31,7 @@ type SessionValue = {
 
 const SessionContext = createContext<SessionValue | null>(null);
 
-// État local de démonstration : l'OTP et le paiement seront branchés sur l'API au lot 1 et au lot 3.
+// Session de l'app : connexion par SMS via Supabase quand il est configuré, sinon état local de démo.
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [subscription, setSubscription] = useState<Subscription>(null);
@@ -37,6 +39,18 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [menuVisible, setMenuVisible] = useState(false);
   const [avatar, setAvatar] = useState<string | null>(null);
   const [myLive, setMyLive] = useState<Live | null>(null);
+
+  // Avec Supabase, on reprend la session enregistrée au démarrage de l'app.
+  useEffect(() => {
+    supabase?.auth.getSession().then(async ({ data }) => {
+      const u = data.session?.user;
+      if (!u?.phone) return;
+      const name = await profileName(u.id);
+      if (!name) return;
+      const d = u.phone.replace(/\D/g, '').replace(/^221/, '');
+      setUser({ phone: `+221 ${d.replace(/(\d{2})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4')}`, name });
+    });
+  }, []);
 
   const value = useMemo<SessionValue>(
     () => ({
@@ -61,6 +75,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         setLoginVisible(false);
       },
       signOut: () => {
+        signOutRemote();
         setUser(null);
         setSubscription(null);
         setAvatar(null);

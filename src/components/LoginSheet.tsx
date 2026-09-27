@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, type Text
 import { Text, TextInput } from './AppText';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSession } from '../context/session';
+import { realAuth, saveProfile, sendOtp, verifyOtp } from '../lib/auth';
 import { colors, radius } from '../theme';
 
 // Numéro sénégalais : 9 chiffres commençant par 7 (70, 75, 76, 77, 78).
@@ -22,6 +23,7 @@ export function LoginSheet() {
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
   const codeInput = useRef<RNTextInput>(null);
 
   const digits = phone.replace(/\D/g, '');
@@ -47,25 +49,52 @@ export function LoginSheet() {
     reset();
   };
 
-  const submit = () => {
-    if (!canContinue) return;
+  const submit = async () => {
+    if (!canContinue || busy) return;
+    setBusy(true);
+    try {
+      await next();
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const next = async () => {
+    const displayPhone = `+221 ${formatPhone(digits)}`;
     if (step === 'phone') {
+      const failure = await sendOtp(digits);
+      if (failure) return setError(failure);
+      setError('');
       setStep('otp');
       return;
     }
     if (step === 'otp') {
-      if (code !== DEMO_CODE) {
+      let knownName = '';
+      if (realAuth) {
+        const result = await verifyOtp(digits, code);
+        if (!result) {
+          setError('Code incorrect ou expiré.');
+          setCode('');
+          return;
+        }
+        knownName = result.name;
+      } else if (code !== DEMO_CODE) {
         setError('Code incorrect. En démo, utilise 123456.');
         setCode('');
         return;
       }
-      // À l'inscription, on complète le profil avant d'entrer.
-      if (mode === 'signup') {
+      // À l'inscription (ou pour un compte sans nom), on complète le profil avant d'entrer.
+      if (mode === 'signup' || (realAuth && !knownName)) {
+        setError('');
         setStep('profile');
         return;
       }
+      signIn(displayPhone, knownName || undefined);
+    } else {
+      const failure = await saveProfile(name.trim(), cleanUsername);
+      if (failure) return setError(failure);
+      signIn(displayPhone, name.trim());
     }
-    signIn(`+221 ${formatPhone(digits)}`, step === 'profile' ? name.trim() : undefined);
     reset();
     setMode('login');
   };
@@ -186,9 +215,13 @@ export function LoginSheet() {
               ) : (
                 <View style={styles.demo}>
                   <Ionicons name="information-circle" size={16} color={colors.navy} />
-                  <Text style={styles.demoText}>
-                    Version démo : aucun SMS n'est envoyé, le code est <Text style={styles.strong}>123456</Text>
-                  </Text>
+                  {realAuth ? (
+                    <Text style={styles.demoText}>Code envoyé par SMS au +221 {formatPhone(digits)}</Text>
+                  ) : (
+                    <Text style={styles.demoText}>
+                      Version démo : aucun SMS n'est envoyé, le code est <Text style={styles.strong}>123456</Text>
+                    </Text>
+                  )}
                 </View>
               )}
               <Pressable onPress={() => setStep('phone')} hitSlop={8}>
@@ -196,9 +229,10 @@ export function LoginSheet() {
               </Pressable>
             </>
           )}
+          {error && step !== 'otp' ? <Text style={styles.error}>{error}</Text> : null}
           <Pressable
             onPress={submit}
-            disabled={!canContinue}
+            disabled={!canContinue || busy}
             style={[styles.button, canContinue ? styles.buttonActive : styles.buttonDisabled]}
           >
             <Text style={[styles.buttonText, canContinue && { color: colors.yellow }]}>
