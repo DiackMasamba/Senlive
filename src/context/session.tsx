@@ -15,7 +15,7 @@ type SessionValue = {
   closeLogin: () => void;
   openMenu: () => void;
   closeMenu: () => void;
-  signIn: (phone: string) => void;
+  signIn: (phone: string, name?: string) => void;
   signOut: () => void;
   subscribe: (method: PaymentMethod) => void;
   cancelSubscription: () => void;
@@ -43,8 +43,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       closeLogin: () => setLoginVisible(false),
       openMenu: () => setMenuVisible(true),
       closeMenu: () => setMenuVisible(false),
-      signIn: (phone) => {
-        setUser({ phone, name: 'Membre Senlive' });
+      signIn: (phone, name) => {
+        setUser({ phone, name: name || 'Membre Senlive' });
         setLoginVisible(false);
       },
       signOut: () => {

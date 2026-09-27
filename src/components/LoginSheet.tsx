@@ -15,20 +15,31 @@ const CODE_LENGTH = 6;
 
 export function LoginSheet() {
   const { loginVisible, closeLogin, signIn } = useSession();
-  const [step, setStep] = useState<'phone' | 'otp'>('phone');
+  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [step, setStep] = useState<'phone' | 'otp' | 'profile'>('phone');
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const codeInput = useRef<RNTextInput>(null);
 
   const digits = phone.replace(/\D/g, '');
-  const canContinue = step === 'phone' ? isValidPhone(digits) : code.length === CODE_LENGTH;
+  const cleanUsername = username.toLowerCase().replace(/[^a-z0-9._]/g, '');
+  const canContinue =
+    step === 'phone'
+      ? isValidPhone(digits)
+      : step === 'otp'
+        ? code.length === CODE_LENGTH
+        : name.trim().length >= 2 && cleanUsername.length >= 3;
 
   const reset = () => {
     setStep('phone');
     setPhone('');
     setCode('');
     setError('');
+    setName('');
+    setUsername('');
   };
 
   const close = () => {
@@ -42,13 +53,21 @@ export function LoginSheet() {
       setStep('otp');
       return;
     }
-    if (code !== DEMO_CODE) {
-      setError('Code incorrect. En démo, utilise 123456.');
-      setCode('');
-      return;
+    if (step === 'otp') {
+      if (code !== DEMO_CODE) {
+        setError('Code incorrect. En démo, utilise 123456.');
+        setCode('');
+        return;
+      }
+      // À l'inscription, on complète le profil avant d'entrer.
+      if (mode === 'signup') {
+        setStep('profile');
+        return;
+      }
     }
-    signIn(`+221 ${formatPhone(digits)}`);
+    signIn(`+221 ${formatPhone(digits)}`, step === 'profile' ? name.trim() : undefined);
     reset();
+    setMode('login');
   };
 
   return (
@@ -57,13 +76,30 @@ export function LoginSheet() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.sheetWrap} pointerEvents="box-none">
         <View style={styles.sheet}>
           <View style={styles.grabber} />
+          {step === 'phone' && (
+            <View style={styles.tabs}>
+              {(['login', 'signup'] as const).map((m) => (
+                <Pressable key={m} style={[styles.tab, mode === m && styles.tabActive]} onPress={() => setMode(m)}>
+                  <Text style={[styles.tabText, mode === m && styles.tabTextActive]}>
+                    {m === 'login' ? 'Connexion' : 'Inscription'}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
           <View style={styles.badge}>
-            <Ionicons name={step === 'phone' ? 'phone-portrait-outline' : 'chatbubble-ellipses-outline'} size={22} color={colors.navy} />
+            <Ionicons
+              name={step === 'phone' ? 'phone-portrait-outline' : step === 'otp' ? 'chatbubble-ellipses-outline' : 'person-outline'}
+              size={22}
+              color={colors.navy}
+            />
           </View>
           {step === 'phone' ? (
             <>
-              <Text style={styles.title}>Déjà membre Senlive ?</Text>
-              <Text style={styles.subtitle}>Entre ton numéro pour te connecter</Text>
+              <Text style={styles.title}>{mode === 'login' ? 'Déjà membre Senlive ?' : 'Crée ton compte Senlive'}</Text>
+              <Text style={styles.subtitle}>
+                {mode === 'login' ? 'Entre ton numéro pour te connecter' : 'Gratuit, il suffit de ton numéro de téléphone'}
+              </Text>
               <View style={styles.field}>
                 <View style={styles.prefix}>
                   <Text style={styles.flag}>🇸🇳</Text>
@@ -84,6 +120,36 @@ export function LoginSheet() {
                 En appuyant sur « Continuer », tu acceptes les <Text style={styles.link}>Conditions générales</Text> et la{' '}
                 <Text style={styles.link}>Politique de confidentialité</Text> de Senlive.
               </Text>
+            </>
+          ) : step === 'profile' ? (
+            <>
+              <Text style={styles.title}>Ton profil</Text>
+              <Text style={styles.subtitle}>C'est ce que les autres verront dans les lives</Text>
+              <View style={styles.field}>
+                <TextInput
+                  value={name}
+                  onChangeText={setName}
+                  placeholder="Prénom et nom"
+                  placeholderTextColor="#9E9E9E"
+                  maxLength={40}
+                  style={styles.input}
+                  autoFocus
+                />
+              </View>
+              <View style={[styles.field, { marginTop: 10 }]}>
+                <View style={styles.prefix}>
+                  <Text style={styles.prefixText}>@</Text>
+                </View>
+                <TextInput
+                  value={cleanUsername}
+                  onChangeText={setUsername}
+                  placeholder="pseudo"
+                  placeholderTextColor="#9E9E9E"
+                  autoCapitalize="none"
+                  maxLength={24}
+                  style={styles.input}
+                />
+              </View>
             </>
           ) : (
             <>
@@ -136,7 +202,7 @@ export function LoginSheet() {
             style={[styles.button, canContinue ? styles.buttonActive : styles.buttonDisabled]}
           >
             <Text style={[styles.buttonText, canContinue && { color: colors.yellow }]}>
-              {step === 'phone' ? 'Continuer' : 'Valider'}
+              {step === 'phone' ? 'Continuer' : step === 'otp' ? 'Valider' : 'Créer mon compte'}
             </Text>
             <Ionicons name="arrow-forward" size={18} color={canContinue ? colors.yellow : '#9E9E9E'} />
           </Pressable>
@@ -165,6 +231,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#D6D6D6',
     marginBottom: 14,
   },
+  tabs: {
+    flexDirection: 'row',
+    backgroundColor: colors.surface,
+    borderRadius: 10,
+    padding: 3,
+    marginBottom: 14,
+  },
+  tab: { flex: 1, height: 34, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  tabActive: { backgroundColor: colors.white, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 4, elevation: 1 },
+  tabText: { color: colors.textMuted, fontSize: 13.5, fontWeight: '500' },
+  tabTextActive: { color: colors.navy, fontWeight: '700' },
   badge: {
     alignSelf: 'center',
     width: 44,
