@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '../components/AppText';
 import { type PaymentMethod, useSession } from '../context/session';
 import { useWallet } from '../context/wallet';
+import { payCoinPack } from '../lib/paydunya';
 import { COIN_FCFA, coinPacks, MIN_WITHDRAW_DIAMONDS, packBonus, REFERRAL_RATE } from '../data/coins';
 import { colors, formatFcfa, radius } from '../theme';
 
@@ -93,9 +94,13 @@ export default function WalletScreen() {
             </View>
             <Pressable
               style={styles.button}
-              onPress={() => {
-                buyPack(pack, method);
-                flash(`+${pack.coins.toLocaleString('fr-FR')} pièces ajoutées`);
+              onPress={async () => {
+                const result = await payCoinPack(pack.id, method);
+                if (result === 'demo' || result === 'completed') {
+                  buyPack(pack, method);
+                  flash(`+${pack.coins.toLocaleString('fr-FR')} pièces ajoutées`);
+                } else if (result === 'pending') flash('Paiement en attente de confirmation');
+                else flash('Paiement non abouti');
               }}
             >
               <Text style={styles.buttonText}>Payer {formatFcfa(pack.price)}</Text>
