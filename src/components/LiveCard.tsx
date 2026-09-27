@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 7,
     paddingVertical: 2,
   },
-  handleText: { color: colors.white, fontSize: 11, fontWeight: '600' },
+  handleText: { color: colors.white, fontSize: 9, fontWeight: '600' },
   viewers: {
     flexDirection: 'row',
     alignItems: 'center',
